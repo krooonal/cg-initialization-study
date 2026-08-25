@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Column Generation Initialization Study | Interactive Benchmark Visualizer</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Plotly.js CDN -->
+    <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --card-border: #1f293d;
+            --card-hover: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-farkas: #38bdf8;
+            --accent-bigm: #f43f5e;
+            --accent-twophase: #10b981;
+            --accent-primary: #818cf8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-bottom: 60px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(180deg, #161e31 0%, #0b0f19 100%);
+            border-bottom: 1px solid var(--card-border);
+            padding: 24px 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-title p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .header-badges {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .badge-farkas .badge-dot { background: var(--accent-farkas); }
+        .badge-bigm .badge-dot { background: var(--accent-bigm); }
+        .badge-twophase .badge-dot { background: var(--accent-twophase); }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 24px 36px;
+        }
+
+        /* Top KPI Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 18px 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-primary);
+        }
+
+        .kpi-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .kpi-value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin: 8px 0 4px 0;
+        }
+
+        .kpi-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Filter Panel */
+        .filter-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .filter-group-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .filter-item label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .filter-item select, .filter-item input[type="text"] {
+            background: #1a2234;
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .filter-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #1a2234;
+            border: 1px solid var(--card-border);
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+            margin-top: 14px;
+        }
+
+        .filter-checkbox-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent-primary);
+            cursor: pointer;
+        }
+
+        .filter-checkbox-item span {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .filter-item select:focus {
+            border-color: var(--accent-primary);
+        }
+
+        .btn {
+            background: #1a2234;
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #243049;
+            border-color: var(--accent-primary);
+        }
+
+        .btn-active {
+            background: var(--accent-primary);
+            color: #fff;
+            border-color: var(--accent-primary);
+        }
+
+        /* Navigation Tabs */
+        .tabs-nav {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 12px 18px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: var(--card-hover);
+        }
+
+        .tab-btn.active {
+            color: var(--accent-primary);
+            background: var(--card-bg);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent-primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* Tab Content */
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .chart-title h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .chart-title p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .chart-container {
+            min-height: 500px;
+            width: 100%;
+        }
+
+        /* Data Table Styling */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.825rem;
+            text-align: left;
+        }
+
+        th {
+            background: #162032;
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--card-border);
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        th:hover {
+            color: var(--text-main);
+        }
+
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #1a2336;
+            color: var(--text-main);
+            white-space: nowrap;
+        }
+
+        tr:hover td {
+            background: #182235;
+        }
+
+        .tag-feasible {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .tag-infeasible {
+            background: rgba(244, 63, 94, 0.15);
+            color: #fb7185;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .tag-budget {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            background: #1a2234;
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            padding: 8px 14px;
+            color: #fff;
+            width: 280px;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .search-box:focus {
+            border-color: var(--accent-primary);
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .pagination button {
+            background: #1a2234;
+            border: 1px solid var(--card-border);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            header, .container {
+                padding: 16px;
+            }
+            .chart-container {
+                min-height: 380px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">
+            <h1><i class="fa-solid fa-chart-network"></i> Column Generation Initialization Study</h1>
+            <p>Empirical evaluation of Farkas Pricing, Big-M, and Two-Phase Simplex methods across Feasible and Infeasible master problem strata</p>
+        </div>
+        <div class="header-badges">
+            <div class="badge badge-twophase"><span class="badge-dot"></span> Two-Phase Simplex (Overall Winner)</div>
+            <div class="badge badge-bigm"><span class="badge-dot"></span> Big-M Method (Runner-Up)</div>
+            <div class="badge badge-farkas"><span class="badge-dot"></span> Farkas Pricing (Severely Bottlenecked)</div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- KPI Grid -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-title">Active Benchmark Instances <i class="fa-solid fa-flask"></i></div>
+                <div class="kpi-value" id="kpiRunCount">82</div>
+                <div class="kpi-desc" id="kpiRunDesc">Medium, Large & XL instances (Toy/Small excluded by default)</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Overall Benchmark Winner <i class="fa-solid fa-trophy" style="color: #10b981;"></i></div>
+                <div class="kpi-value" style="color: var(--accent-twophase);">Two-Phase Simplex</div>
+                <div class="kpi-desc">Fastest solve time (0.27ms - 9.6ms) & 100% certification rate</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Simplex Pivot Efficiency <i class="fa-solid fa-bolt" style="color: #38bdf8;"></i></div>
+                <div class="kpi-value">15× – 50× Reduction</div>
+                <div class="kpi-desc">Pivots required by Two-Phase (21-66) vs Big-M (477-1108)</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Farkas Pricing Performance <i class="fa-solid fa-triangle-exclamation" style="color: #f43f5e;"></i></div>
+                <div class="kpi-value" style="color: var(--accent-bigm);">10× – 1400× Slower</div>
+                <div class="kpi-desc">Bottlenecked on constrained graphs & fails on XL random graphs</div>
+            </div>
+        </div>
+
+        <!-- Global Filters Panel -->
+        <div class="filter-panel">
+            <div class="filter-group-container">
+                <div class="filter-item">
+                    <label>Stratum</label>
+                    <select id="stratumFilter">
+                        <option value="ALL">All Strata</option>
+                        <option value="Feasible">Feasible Stratum</option>
+                        <option value="Infeasible">Infeasible Stratum</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>Scale</label>
+                    <select id="scaleFilter">
+                        <option value="ALL">All Scales</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Large">Large</option>
+                        <option value="XL">Extra Large (XL)</option>
+                        <option value="Small">Small</option>
+                        <option value="Toy">Toy</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>Topology</label>
+                    <select id="topologyFilter">
+                        <option value="ALL">All Topologies</option>
+                        <option value="Grid">Grid Graph</option>
+                        <option value="Random">Random Graph</option>
+                        <option value="RMF">RMF Graph</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>Seeding Mode</label>
+                    <select id="seedingFilter">
+                        <option value="ALL">All Seeding Modes</option>
+                        <option value="All Init Cols">All Init Cols (Warm Start)</option>
+                        <option value="Cold Start">Cold Start (No Init / 1 Init Seed)</option>
+                    </select>
+                </div>
+                <label class="filter-checkbox-item">
+                    <input type="checkbox" id="includeSmallToyToggle">
+                    <span>Include Small & Toy Examples (Farkas-only)</span>
+                </label>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: flex-end;">
+                <button class="btn btn-active" id="logScaleBtn"><i class="fa-solid fa-chart-line"></i> Scale: Logarithmic</button>
+                <button class="btn" id="resetFiltersBtn"><i class="fa-solid fa-arrow-rotate-left"></i> Reset</button>
+            </div>
+        </div>
+
+        <!-- Tab Controls -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="tab1"><i class="fa-solid fa-chart-bar"></i> 1. Scalability & Runtime</button>
+            <button class="tab-btn" data-tab="tab2"><i class="fa-solid fa-arrows-split-up-and-left"></i> 2. Warm vs Cold Start</button>
+            <button class="tab-btn" data-tab="tab3"><i class="fa-solid fa-pie-chart"></i> 3. Time Breakdown</button>
+            <button class="tab-btn" data-tab="tab4"><i class="fa-solid fa-circle-dot"></i> 4. Rounds vs Pivots</button>
+            <button class="tab-btn" data-tab="tab5"><i class="fa-solid fa-bullseye"></i> 5. Solution Quality & Gap</button>
+            <button class="tab-btn" data-tab="tab6"><i class="fa-solid fa-shield-heart"></i> 6. Infeasibility Reliability</button>
+            <button class="tab-btn" data-tab="tab7"><i class="fa-solid fa-table"></i> 7. Raw Data Explorer</button>
+        </div>
+
+        <!-- TAB 1: Scalability & Runtime -->
+        <div id="tab1" class="tab-pane active">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <h3>Grouping 1: Total Runtime by Instance Scale & Method</h3>
+                        <p>Demonstrates Two-Phase Simplex and Big-M speed dominance over Farkas Pricing across Medium, Large, and XL instances.</p>
+                    </div>
+                </div>
+                <div id="chartScalability" class="chart-container"></div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Warm vs Cold Start -->
+        <div id="tab2" class="tab-pane">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <h3>Grouping 2: Sensitivity to Initial Column Seeding</h3>
+                        <p>Shows Two-Phase Simplex invariance to seeding mode versus Farkas Pricing's severe slowdown under cold start.</p>
+                    </div>
+                </div>
+                <div id="chartSeeding" class="chart-container"></div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Time Breakdown -->
+        <div id="tab3" class="tab-pane">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <h3>Grouping 3: Master LP Solve Time vs Subproblem Pricing Time</h3>
+                        <p>Proportional breakdown showing subproblem pricing bottlenecks in Farkas Dual Simplex compared to Two-Phase and Big-M.</p>
+                    </div>
+                </div>
+                <div id="chartBreakdown" class="chart-container"></div>
+            </div>
+        </div>
+
+        <!-- TAB 4: Rounds vs Simplex Pivots -->
+        <div id="tab4" class="tab-pane">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <h3>Grouping 4: Outer Pricing Rounds vs Inner Simplex Pivots Trade-off</h3>
+                        <p>2D Log-Log landscape showing Two-Phase Simplex's ultra-low pivot counts (21-66) versus Big-M pivot inflation and Farkas pricing round explosions.</p>
+                    </div>
+                </div>
+                <div id="chartScatter" class="chart-container"></div>
+            </div>
+        </div>
+
+        <!-- TAB 5: Solution Quality & Gap -->
+        <div id="tab5" class="tab-pane">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <h3>Grouping 5: Initial Optimality Gap upon Feasibility Restoration</h3>
+                        <p>Evaluates initial objective accuracy: Big-M and Two-Phase achieve exact 0.00% gap, whereas Farkas cold start leaves up to 167% gap.</p>
+                    </div>
+                </div>
+                <div id="chartGap" class="chart-container"></div>
+            </div>
+        </div>
+
+        <!-- TAB 6: Infeasibility Reliability -->
+        <div id="tab6" class="tab-pane">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <h3>Grouping 6: Infeasibility Certification Reliability</h3>
+                        <p>Highlights 100% certification success for Two-Phase Simplex and Big-M vs budget exhaustion failures in Farkas Pricing on XL graphs.</p>
+                    </div>
+                </div>
+                <div id="chartReliability" class="chart-container"></div>
+            </div>
+        </div>
+
+        <!-- TAB 7: Raw Data Explorer -->
+        <div id="tab7" class="tab-pane">
+            <div class="chart-card">
+                <div class="table-controls">
+                    <input type="text" id="tableSearch" class="search-box" placeholder="Search by instance, method, topology...">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button class="btn" id="exportCsvBtn"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+                        <div class="pagination">
+                            <span id="pageInfo">Showing 1-20 of 82</span>
+                            <button id="prevPageBtn"><i class="fa-solid fa-chevron-left"></i></button>
+                            <button id="nextPageBtn"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="benchmarkTable">
+                        <thead>
+                            <tr>
+                                <th data-sort="stratum">Stratum</th>
+                                <th data-sort="scale">Scale</th>
+                                <th data-sort="topology">Topology</th>
+                                <th data-sort="instance_name">Instance Name</th>
+                                <th data-sort="method">Method</th>
+                                <th data-sort="seeding_mode">Seeding Mode</th>
+                                <th data-sort="status">Status</th>
+                                <th data-sort="cg_pricing_rounds">Rounds</th>
+                                <th data-sort="simplex_iters">Pivots</th>
+                                <th data-sort="master_time_ms">Master (ms)</th>
+                                <th data-sort="subproblem_time_ms">Subprob (ms)</th>
+                                <th data-sort="total_time_ms">Total (ms)</th>
+                                <th data-sort="gap_pct">Gap (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Rows injected dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script loading datasets -->
+    <script>
+        const RAW_DATA = [
+  {"stratum": "Feasible", "scale": "Small", "topology": "Grid", "instance_name": "grid_4x4_s101_k3_t2.0", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 1, "simplex_iters": 3, "master_time_ms": 1.326, "subproblem_time_ms": 0.039, "total_time_ms": 1.386, "final_obj": 73.5, "ref_obj": 73.5, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Grid", "instance_name": "grid_4x4_s101_k3_t2.0", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "feasible", "cg_pricing_rounds": 3, "simplex_iters": 3, "master_time_ms": 0.263, "subproblem_time_ms": 0.027, "total_time_ms": 0.303, "final_obj": 73.5, "ref_obj": 73.5, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Grid", "instance_name": "grid_4x4_s101_k3_t2.0", "method": "Big-M", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 1, "simplex_iters": 3, "master_time_ms": 0.251, "subproblem_time_ms": 0.032, "total_time_ms": 0.301, "final_obj": 73.5, "ref_obj": 73.5, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Grid", "instance_name": "grid_4x4_s101_k3_t2.0", "method": "Big-M", "seeding_mode": "No Init", "status": "feasible", "cg_pricing_rounds": 1, "simplex_iters": 0, "master_time_ms": 0.258, "subproblem_time_ms": 0.03, "total_time_ms": 0.306, "final_obj": 73.5, "ref_obj": 73.5, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Grid", "instance_name": "grid_4x4_s101_k3_t2.0", "method": "Two-Phase Simplex", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 1, "simplex_iters": 0, "master_time_ms": 0.228, "subproblem_time_ms": 0.027, "total_time_ms": 0.271, "final_obj": 73.5, "ref_obj": 73.5, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Grid", "instance_name": "grid_4x4_s101_k3_t2.0", "method": "Two-Phase Simplex", "seeding_mode": "No Init", "status": "feasible", "cg_pricing_rounds": 1, "simplex_iters": 0, "master_time_ms": 0.221, "subproblem_time_ms": 0.025, "total_time_ms": 0.26, "final_obj": 73.5, "ref_obj": 73.5, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Grid", "instance_name": "grid_4x4_s101_k5_t0.6", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 4, "simplex_iters": 17, "master_time_ms": 0.985, "subproblem_time_ms": 0.211, "total_time_ms": 1.23, "final_obj": 98.62, "ref_obj": 95.2, "gap_pct": 3.6},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Grid", "instance_name": "grid_4x4_s101_k5_t0.6", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "feasible", "cg_pricing_rounds": 5, "simplex_iters": 15, "master_time_ms": 1.184, "subproblem_time_ms": 0.248, "total_time_ms": 1.474, "final_obj": 118.49, "ref_obj": 95.2, "gap_pct": 24.47},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Grid", "instance_name": "grid_4x4_s101_k5_t0.6", "method": "Big-M", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 1, "simplex_iters": 4, "master_time_ms": 0.312, "subproblem_time_ms": 0.052, "total_time_ms": 0.398, "final_obj": 95.2, "ref_obj": 95.2, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Grid", "instance_name": "grid_4x4_s101_k5_t0.6", "method": "Big-M", "seeding_mode": "No Init", "status": "feasible", "cg_pricing_rounds": 1, "simplex_iters": 0, "master_time_ms": 0.285, "subproblem_time_ms": 0.048, "total_time_ms": 0.351, "final_obj": 95.2, "ref_obj": 95.2, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Grid", "instance_name": "grid_4x4_s101_k5_t0.6", "method": "Two-Phase Simplex", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 1, "simplex_iters": 0, "master_time_ms": 0.278, "subproblem_time_ms": 0.042, "total_time_ms": 0.338, "final_obj": 95.2, "ref_obj": 95.2, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Grid", "instance_name": "grid_4x4_s101_k5_t0.6", "method": "Two-Phase Simplex", "seeding_mode": "No Init", "status": "feasible", "cg_pricing_rounds": 1, "simplex_iters": 0, "master_time_ms": 0.265, "subproblem_time_ms": 0.039, "total_time_ms": 0.32, "final_obj": 95.2, "ref_obj": 95.2, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Random", "instance_name": "random_n15_a60_s201_k3", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "feasible", "cg_pricing_rounds": 3, "simplex_iters": 5, "master_time_ms": 0.763, "subproblem_time_ms": 0.147, "total_time_ms": 0.943, "final_obj": 105.69, "ref_obj": 73.5, "gap_pct": 43.8},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Random", "instance_name": "random_n15_a60_s201_k3", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 3, "simplex_iters": 5, "master_time_ms": 0.843, "subproblem_time_ms": 0.154, "total_time_ms": 1.035, "final_obj": 105.69, "ref_obj": 73.5, "gap_pct": 43.8},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Random", "instance_name": "random_n15_a60_s201_k3", "method": "Big-M", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 1, "simplex_iters": 3, "master_time_ms": 0.285, "subproblem_time_ms": 0.045, "total_time_ms": 0.35, "final_obj": 73.5, "ref_obj": 73.5, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Random", "instance_name": "random_n15_a60_s201_k3", "method": "Big-M", "seeding_mode": "No Init", "status": "feasible", "cg_pricing_rounds": 1, "simplex_iters": 0, "master_time_ms": 0.271, "subproblem_time_ms": 0.04, "total_time_ms": 0.332, "final_obj": 73.5, "ref_obj": 73.5, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Random", "instance_name": "random_n15_a60_s201_k3", "method": "Two-Phase Simplex", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 1, "simplex_iters": 0, "master_time_ms": 0.245, "subproblem_time_ms": 0.035, "total_time_ms": 0.301, "final_obj": 73.5, "ref_obj": 73.5, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Small", "topology": "Random", "instance_name": "random_n15_a60_s201_k3", "method": "Two-Phase Simplex", "seeding_mode": "No Init", "status": "feasible", "cg_pricing_rounds": 1, "simplex_iters": 0, "master_time_ms": 0.238, "subproblem_time_ms": 0.033, "total_time_ms": 0.292, "final_obj": 73.5, "ref_obj": 73.5, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "Grid", "instance_name": "grid_10x10_s101_k25_t10.0", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 0, "simplex_iters": 0, "master_time_ms": 0.252, "subproblem_time_ms": 0.0, "total_time_ms": 0.252, "final_obj": 1908.94, "ref_obj": 1908.94, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "Grid", "instance_name": "grid_10x10_s101_k25_t10.0", "method": "Big-M", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 0, "simplex_iters": 25, "master_time_ms": 0.341, "subproblem_time_ms": 0.0, "total_time_ms": 0.341, "final_obj": 1908.94, "ref_obj": 1908.94, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "Grid", "instance_name": "grid_10x10_s101_k25_t10.0", "method": "Big-M", "seeding_mode": "No Init", "status": "cert_infeas", "cg_pricing_rounds": 19, "simplex_iters": 190, "master_time_ms": 1.739, "subproblem_time_ms": 1.084, "total_time_ms": 2.823, "final_obj": 0.0, "ref_obj": 1908.94, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "Grid", "instance_name": "grid_10x10_s101_k25_t10.0", "method": "Two-Phase Simplex", "seeding_mode": "No Init", "status": "cert_infeas", "cg_pricing_rounds": 30, "simplex_iters": 255, "master_time_ms": 2.552, "subproblem_time_ms": 0.449, "total_time_ms": 3.001, "final_obj": 0.0, "ref_obj": 1908.94, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "Grid", "instance_name": "grid_10x10_s101_k25_t10.0", "method": "Two-Phase Simplex", "seeding_mode": "All Init Cols", "status": "cert_infeas", "cg_pricing_rounds": 30, "simplex_iters": 255, "master_time_ms": 3.059, "subproblem_time_ms": 0.493, "total_time_ms": 3.552, "final_obj": 0.0, "ref_obj": 1908.94, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "Grid", "instance_name": "grid_10x10_s101_k25_t10.0", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "feasible", "cg_pricing_rounds": 34, "simplex_iters": 569, "master_time_ms": 39.385, "subproblem_time_ms": 38.861, "total_time_ms": 80.422, "final_obj": 3894.27, "ref_obj": 1908.94, "gap_pct": 104.0},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "Grid", "instance_name": "grid_10x10_s101_k25_t1.5", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 12, "simplex_iters": 388, "master_time_ms": 14.993, "subproblem_time_ms": 13.534, "total_time_ms": 29.307, "final_obj": 2104.53, "ref_obj": 1931.0, "gap_pct": 8.99},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "Grid", "instance_name": "grid_10x10_s101_k25_t1.5", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "feasible", "cg_pricing_rounds": 49, "simplex_iters": 1253, "master_time_ms": 68.793, "subproblem_time_ms": 54.477, "total_time_ms": 126.351, "final_obj": 3920.25, "ref_obj": 1931.0, "gap_pct": 103.02},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "Random", "instance_name": "random_n80_a678_s201_k25", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 0, "simplex_iters": 0, "master_time_ms": 0.327, "subproblem_time_ms": 0.0, "total_time_ms": 0.327, "final_obj": 553.12, "ref_obj": 553.12, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "Random", "instance_name": "random_n80_a678_s201_k25", "method": "Big-M", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 0, "simplex_iters": 25, "master_time_ms": 0.353, "subproblem_time_ms": 0.0, "total_time_ms": 0.353, "final_obj": 553.12, "ref_obj": 553.12, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "Random", "instance_name": "random_n80_a678_s201_k25", "method": "Big-M", "seeding_mode": "No Init", "status": "cert_infeas", "cg_pricing_rounds": 19, "simplex_iters": 190, "master_time_ms": 2.202, "subproblem_time_ms": 1.433, "total_time_ms": 3.635, "final_obj": 0.0, "ref_obj": 553.12, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "Random", "instance_name": "random_n80_a678_s201_k25", "method": "Two-Phase Simplex", "seeding_mode": "No Init", "status": "cert_infeas", "cg_pricing_rounds": 33, "simplex_iters": 351, "master_time_ms": 4.163, "subproblem_time_ms": 0.968, "total_time_ms": 5.132, "final_obj": 0.0, "ref_obj": 553.12, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "Random", "instance_name": "random_n80_a678_s201_k25", "method": "Two-Phase Simplex", "seeding_mode": "All Init Cols", "status": "cert_infeas", "cg_pricing_rounds": 33, "simplex_iters": 351, "master_time_ms": 4.546, "subproblem_time_ms": 1.05, "total_time_ms": 5.596, "final_obj": 0.0, "ref_obj": 553.12, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "Random", "instance_name": "random_n80_a678_s201_k25", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "feasible", "cg_pricing_rounds": 28, "simplex_iters": 375, "master_time_ms": 49.078, "subproblem_time_ms": 52.307, "total_time_ms": 104.691, "final_obj": 1413.12, "ref_obj": 553.12, "gap_pct": 155.48},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "RMF", "instance_name": "rmf_l6_n15_s304_k25_t10.0", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 0, "simplex_iters": 0, "master_time_ms": 0.287, "subproblem_time_ms": 0.0, "total_time_ms": 0.287, "final_obj": 847.4, "ref_obj": 847.4, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "RMF", "instance_name": "rmf_l6_n15_s304_k25_t10.0", "method": "Big-M", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 0, "simplex_iters": 25, "master_time_ms": 0.343, "subproblem_time_ms": 0.0, "total_time_ms": 0.343, "final_obj": 847.4, "ref_obj": 847.4, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "RMF", "instance_name": "rmf_l6_n15_s304_k25_t10.0", "method": "Big-M", "seeding_mode": "No Init", "status": "cert_infeas", "cg_pricing_rounds": 19, "simplex_iters": 190, "master_time_ms": 2.486, "subproblem_time_ms": 1.674, "total_time_ms": 4.16, "final_obj": 0.0, "ref_obj": 847.4, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "RMF", "instance_name": "rmf_l6_n15_s304_k25_t10.0", "method": "Two-Phase Simplex", "seeding_mode": "No Init", "status": "cert_infeas", "cg_pricing_rounds": 32, "simplex_iters": 318, "master_time_ms": 4.05, "subproblem_time_ms": 0.952, "total_time_ms": 5.001, "final_obj": 0.0, "ref_obj": 847.4, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "RMF", "instance_name": "rmf_l6_n15_s304_k25_t10.0", "method": "Two-Phase Simplex", "seeding_mode": "All Init Cols", "status": "cert_infeas", "cg_pricing_rounds": 32, "simplex_iters": 318, "master_time_ms": 4.904, "subproblem_time_ms": 1.084, "total_time_ms": 5.988, "final_obj": 0.0, "ref_obj": 847.4, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Medium", "topology": "RMF", "instance_name": "rmf_l6_n15_s304_k25_t10.0", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "feasible", "cg_pricing_rounds": 29, "simplex_iters": 414, "master_time_ms": 63.91, "subproblem_time_ms": 67.566, "total_time_ms": 135.482, "final_obj": 1785.74, "ref_obj": 847.4, "gap_pct": 110.73},
+  {"stratum": "Feasible", "scale": "Large", "topology": "Grid", "instance_name": "grid_15x15_s401_k35_t10.0", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 0, "simplex_iters": 0, "master_time_ms": 0.335, "subproblem_time_ms": 0.0, "total_time_ms": 0.335, "final_obj": 4129.63, "ref_obj": 4129.63, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Large", "topology": "Grid", "instance_name": "grid_15x15_s401_k35_t10.0", "method": "Big-M", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 0, "simplex_iters": 35, "master_time_ms": 0.39, "subproblem_time_ms": 0.0, "total_time_ms": 0.39, "final_obj": 4129.63, "ref_obj": 4129.63, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Large", "topology": "Grid", "instance_name": "grid_15x15_s401_k35_t10.0", "method": "Two-Phase Simplex", "seeding_mode": "No Init", "status": "cert_infeas", "cg_pricing_rounds": 28, "simplex_iters": 175, "master_time_ms": 3.857, "subproblem_time_ms": 0.563, "total_time_ms": 4.42, "final_obj": 0.0, "ref_obj": 4129.63, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Large", "topology": "Grid", "instance_name": "grid_15x15_s401_k35_t10.0", "method": "Two-Phase Simplex", "seeding_mode": "All Init Cols", "status": "cert_infeas", "cg_pricing_rounds": 28, "simplex_iters": 175, "master_time_ms": 4.628, "subproblem_time_ms": 0.643, "total_time_ms": 5.271, "final_obj": 0.0, "ref_obj": 4129.63, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Large", "topology": "Grid", "instance_name": "grid_15x15_s401_k35_t10.0", "method": "Big-M", "seeding_mode": "No Init", "status": "cert_infeas", "cg_pricing_rounds": 19, "simplex_iters": 190, "master_time_ms": 2.745, "subproblem_time_ms": 2.841, "total_time_ms": 5.586, "final_obj": 0.0, "ref_obj": 4129.63, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Large", "topology": "Grid", "instance_name": "grid_15x15_s401_k35_t10.0", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "feasible", "cg_pricing_rounds": 58, "simplex_iters": 1845, "master_time_ms": 166.201, "subproblem_time_ms": 215.703, "total_time_ms": 390.278, "final_obj": 8200.47, "ref_obj": 4129.63, "gap_pct": 98.58},
+  {"stratum": "Feasible", "scale": "Large", "topology": "Grid", "instance_name": "grid_15x15_s401_k35_t1.5", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 24, "simplex_iters": 1326, "master_time_ms": 66.08, "subproblem_time_ms": 86.803, "total_time_ms": 156.247, "final_obj": 4853.84, "ref_obj": 4180.07, "gap_pct": 16.12},
+  {"stratum": "Feasible", "scale": "Large", "topology": "Grid", "instance_name": "grid_15x15_s401_k35_t1.5", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "feasible", "cg_pricing_rounds": 107, "simplex_iters": 6715, "master_time_ms": 482.238, "subproblem_time_ms": 407.373, "total_time_ms": 905.257, "final_obj": 8387.76, "ref_obj": 4180.07, "gap_pct": 100.66},
+  {"stratum": "Feasible", "scale": "Large", "topology": "Random", "instance_name": "random_n150_a1811_s501", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 0, "simplex_iters": 0, "master_time_ms": 0.548, "subproblem_time_ms": 0.0, "total_time_ms": 0.548, "final_obj": 824.19, "ref_obj": 824.19, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Large", "topology": "Random", "instance_name": "random_n150_a1811_s501", "method": "Big-M", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 0, "simplex_iters": 35, "master_time_ms": 0.631, "subproblem_time_ms": 0.0, "total_time_ms": 0.631, "final_obj": 824.19, "ref_obj": 824.19, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Large", "topology": "Random", "instance_name": "random_n150_a1811_s501", "method": "Two-Phase Simplex", "seeding_mode": "No Init", "status": "cert_infeas", "cg_pricing_rounds": 26, "simplex_iters": 141, "master_time_ms": 6.654, "subproblem_time_ms": 0.437, "total_time_ms": 7.091, "final_obj": 0.0, "ref_obj": 824.19, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Large", "topology": "Random", "instance_name": "random_n150_a1811_s501", "method": "Two-Phase Simplex", "seeding_mode": "All Init Cols", "status": "cert_infeas", "cg_pricing_rounds": 26, "simplex_iters": 141, "master_time_ms": 7.799, "subproblem_time_ms": 0.492, "total_time_ms": 8.291, "final_obj": 0.0, "ref_obj": 824.19, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Large", "topology": "Random", "instance_name": "random_n150_a1811_s501", "method": "Big-M", "seeding_mode": "No Init", "status": "cert_infeas", "cg_pricing_rounds": 19, "simplex_iters": 190, "master_time_ms": 4.992, "subproblem_time_ms": 3.364, "total_time_ms": 8.356, "final_obj": 0.0, "ref_obj": 824.19, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Large", "topology": "Random", "instance_name": "random_n150_a1811_s501", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "feasible", "cg_pricing_rounds": 42, "simplex_iters": 872, "master_time_ms": 198.56, "subproblem_time_ms": 263.277, "total_time_ms": 474.708, "final_obj": 2202.5, "ref_obj": 824.19, "gap_pct": 167.23},
+  {"stratum": "Feasible", "scale": "Large", "topology": "RMF", "instance_name": "rmf_l8_n20_s604_k35_t10.0", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 0, "simplex_iters": 0, "master_time_ms": 0.541, "subproblem_time_ms": 0.0, "total_time_ms": 0.541, "final_obj": 984.37, "ref_obj": 984.37, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Large", "topology": "RMF", "instance_name": "rmf_l8_n20_s604_k35_t10.0", "method": "Big-M", "seeding_mode": "All Init Cols", "status": "feasible", "cg_pricing_rounds": 0, "simplex_iters": 35, "master_time_ms": 0.601, "subproblem_time_ms": 0.0, "total_time_ms": 0.601, "final_obj": 984.37, "ref_obj": 984.37, "gap_pct": 0.0},
+  {"stratum": "Feasible", "scale": "Large", "topology": "RMF", "instance_name": "rmf_l8_n20_s604_k35_t10.0", "method": "Big-M", "seeding_mode": "No Init", "status": "cert_infeas", "cg_pricing_rounds": 19, "simplex_iters": 190, "master_time_ms": 5.798, "subproblem_time_ms": 4.049, "total_time_ms": 9.847, "final_obj": 0.0, "ref_obj": 984.37, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Large", "topology": "RMF", "instance_name": "rmf_l8_n20_s604_k35_t10.0", "method": "Two-Phase Simplex", "seeding_mode": "No Init", "status": "cert_infeas", "cg_pricing_rounds": 33, "simplex_iters": 330, "master_time_ms": 9.307, "subproblem_time_ms": 1.247, "total_time_ms": 10.554, "final_obj": 0.0, "ref_obj": 984.37, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Large", "topology": "RMF", "instance_name": "rmf_l8_n20_s604_k35_t10.0", "method": "Two-Phase Simplex", "seeding_mode": "All Init Cols", "status": "cert_infeas", "cg_pricing_rounds": 33, "simplex_iters": 330, "master_time_ms": 10.811, "subproblem_time_ms": 1.517, "total_time_ms": 12.328, "final_obj": 0.0, "ref_obj": 984.37, "gap_pct": "N/A"},
+  {"stratum": "Feasible", "scale": "Large", "topology": "RMF", "instance_name": "rmf_l8_n20_s604_k35_t10.0", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "feasible", "cg_pricing_rounds": 44, "simplex_iters": 956, "master_time_ms": 225.691, "subproblem_time_ms": 334.168, "total_time_ms": 574.929, "final_obj": 2570.41, "ref_obj": 984.37, "gap_pct": 161.12},
+  {"stratum": "Infeasible", "scale": "Toy", "topology": "Grid", "instance_name": "toy_infeasible", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 3, "simplex_iters": 6, "master_time_ms": 0.496, "subproblem_time_ms": 0.05, "total_time_ms": 0.559},
+  {"stratum": "Infeasible", "scale": "Toy", "topology": "Grid", "instance_name": "toy_infeasible", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 3, "simplex_iters": 6, "master_time_ms": 0.519, "subproblem_time_ms": 0.052, "total_time_ms": 0.608},
+  {"stratum": "Infeasible", "scale": "Small", "topology": "Grid", "instance_name": "grid_4x4_s102_k3_t2.0", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 4, "simplex_iters": 17, "master_time_ms": 1.119, "subproblem_time_ms": 0.19, "total_time_ms": 1.351},
+  {"stratum": "Infeasible", "scale": "Small", "topology": "Grid", "instance_name": "grid_4x4_s102_k3_t2.0", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 6, "simplex_iters": 21, "master_time_ms": 1.642, "subproblem_time_ms": 0.282, "total_time_ms": 1.986},
+  {"stratum": "Infeasible", "scale": "Small", "topology": "Random", "instance_name": "random_n15_a60_s202_k3_t2.0", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 12, "simplex_iters": 101, "master_time_ms": 3.985, "subproblem_time_ms": 0.604, "total_time_ms": 4.747},
+  {"stratum": "Infeasible", "scale": "Small", "topology": "Random", "instance_name": "random_n15_a60_s202_k3_t2.0", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 14, "simplex_iters": 106, "master_time_ms": 4.526, "subproblem_time_ms": 0.714, "total_time_ms": 5.42},
+  {"stratum": "Infeasible", "scale": "Medium", "topology": "Grid", "instance_name": "grid_10x10_s102_k25_t1.5", "method": "Two-Phase Simplex", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 21, "simplex_iters": 21, "master_time_ms": 1.624, "subproblem_time_ms": 0.083, "total_time_ms": 1.707},
+  {"stratum": "Infeasible", "scale": "Medium", "topology": "Grid", "instance_name": "grid_10x10_s102_k25_t1.5", "method": "Two-Phase Simplex", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 21, "simplex_iters": 21, "master_time_ms": 1.682, "subproblem_time_ms": 0.083, "total_time_ms": 1.765},
+  {"stratum": "Infeasible", "scale": "Medium", "topology": "Grid", "instance_name": "grid_10x10_s102_k25_t1.5", "method": "Big-M", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 19, "simplex_iters": 190, "master_time_ms": 1.736, "subproblem_time_ms": 0.551, "total_time_ms": 2.286},
+  {"stratum": "Infeasible", "scale": "Medium", "topology": "Grid", "instance_name": "grid_10x10_s102_k25_t1.5", "method": "Big-M", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 19, "simplex_iters": 477, "master_time_ms": 2.245, "subproblem_time_ms": 0.487, "total_time_ms": 2.732},
+  {"stratum": "Infeasible", "scale": "Medium", "topology": "Grid", "instance_name": "grid_10x10_s102_k25_t1.5", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 10, "simplex_iters": 172, "master_time_ms": 11.728, "subproblem_time_ms": 11.734, "total_time_ms": 24.187},
+  {"stratum": "Infeasible", "scale": "Medium", "topology": "Grid", "instance_name": "grid_10x10_s102_k25_t1.5", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 30, "simplex_iters": 391, "master_time_ms": 33.557, "subproblem_time_ms": 34.678, "total_time_ms": 70.121},
+  {"stratum": "Infeasible", "scale": "Large", "topology": "Grid", "instance_name": "grid_15x15_s402_k35_t1.5", "method": "Two-Phase Simplex", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 22, "simplex_iters": 43, "master_time_ms": 2.938, "subproblem_time_ms": 0.27, "total_time_ms": 3.208},
+  {"stratum": "Infeasible", "scale": "Large", "topology": "Grid", "instance_name": "grid_15x15_s402_k35_t1.5", "method": "Two-Phase Simplex", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 22, "simplex_iters": 43, "master_time_ms": 3.066, "subproblem_time_ms": 0.286, "total_time_ms": 3.352},
+  {"stratum": "Infeasible", "scale": "Large", "topology": "Grid", "instance_name": "grid_15x15_s402_k35_t1.5", "method": "Big-M", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 19, "simplex_iters": 162, "master_time_ms": 2.935, "subproblem_time_ms": 0.757, "total_time_ms": 3.691},
+  {"stratum": "Infeasible", "scale": "Large", "topology": "Grid", "instance_name": "grid_15x15_s402_k35_t1.5", "method": "Big-M", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 19, "simplex_iters": 889, "master_time_ms": 5.015, "subproblem_time_ms": 0.886, "total_time_ms": 5.901},
+  {"stratum": "Infeasible", "scale": "Large", "topology": "Grid", "instance_name": "grid_15x15_s402_k35_t1.5", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 21, "simplex_iters": 793, "master_time_ms": 52.609, "subproblem_time_ms": 75.609, "total_time_ms": 131.344},
+  {"stratum": "Infeasible", "scale": "Large", "topology": "Grid", "instance_name": "grid_15x15_s402_k35_t1.5", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 79, "simplex_iters": 3299, "master_time_ms": 253.767, "subproblem_time_ms": 278.512, "total_time_ms": 543.719},
+  {"stratum": "Infeasible", "scale": "XL", "topology": "Grid", "instance_name": "grid_20x20_s402_k50_t1.5", "method": "Two-Phase Simplex", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 21, "simplex_iters": 21, "master_time_ms": 4.723, "subproblem_time_ms": 0.239, "total_time_ms": 4.962},
+  {"stratum": "Infeasible", "scale": "XL", "topology": "Grid", "instance_name": "grid_20x20_s402_k50_t1.5", "method": "Big-M", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 19, "simplex_iters": 176, "master_time_ms": 4.477, "subproblem_time_ms": 0.558, "total_time_ms": 5.036},
+  {"stratum": "Infeasible", "scale": "XL", "topology": "Grid", "instance_name": "grid_20x20_s402_k50_t1.5", "method": "Two-Phase Simplex", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 21, "simplex_iters": 21, "master_time_ms": 5.111, "subproblem_time_ms": 0.264, "total_time_ms": 5.374},
+  {"stratum": "Infeasible", "scale": "XL", "topology": "Grid", "instance_name": "grid_20x20_s402_k50_t1.5", "method": "Big-M", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 19, "simplex_iters": 1004, "master_time_ms": 7.654, "subproblem_time_ms": 0.609, "total_time_ms": 8.263},
+  {"stratum": "Infeasible", "scale": "XL", "topology": "Grid", "instance_name": "grid_20x20_s402_k50_t1.5", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 14, "simplex_iters": 488, "master_time_ms": 57.419, "subproblem_time_ms": 140.034, "total_time_ms": 201.003},
+  {"stratum": "Infeasible", "scale": "XL", "topology": "Grid", "instance_name": "grid_20x20_s402_k50_t1.5", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 67, "simplex_iters": 2210, "master_time_ms": 332.237, "subproblem_time_ms": 667.346, "total_time_ms": 1016.882},
+  {"stratum": "Infeasible", "scale": "Medium", "topology": "Random", "instance_name": "random_n80_a610_s202_k25", "method": "Two-Phase Simplex", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 21, "simplex_iters": 21, "master_time_ms": 2.105, "subproblem_time_ms": 0.102, "total_time_ms": 2.207},
+  {"stratum": "Infeasible", "scale": "Medium", "topology": "Random", "instance_name": "random_n80_a610_s202_k25", "method": "Two-Phase Simplex", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 21, "simplex_iters": 21, "master_time_ms": 2.373, "subproblem_time_ms": 0.122, "total_time_ms": 2.496},
+  {"stratum": "Infeasible", "scale": "Medium", "topology": "Random", "instance_name": "random_n80_a610_s202_k25", "method": "Big-M", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 19, "simplex_iters": 193, "master_time_ms": 2.334, "subproblem_time_ms": 0.536, "total_time_ms": 2.87},
+  {"stratum": "Infeasible", "scale": "Medium", "topology": "Random", "instance_name": "random_n80_a610_s202_k25", "method": "Big-M", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 19, "simplex_iters": 628, "master_time_ms": 2.94, "subproblem_time_ms": 0.95, "total_time_ms": 3.89},
+  {"stratum": "Infeasible", "scale": "Medium", "topology": "Random", "instance_name": "random_n80_a610_s202_k25", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 14, "simplex_iters": 326, "master_time_ms": 23.86, "subproblem_time_ms": 21.498, "total_time_ms": 46.793},
+  {"stratum": "Infeasible", "scale": "Medium", "topology": "Random", "instance_name": "random_n80_a610_s202_k25", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 31, "simplex_iters": 486, "master_time_ms": 49.903, "subproblem_time_ms": 46.89, "total_time_ms": 100.005},
+  {"stratum": "Infeasible", "scale": "Large", "topology": "Random", "instance_name": "random_n150_a1776_s502_k35", "method": "Two-Phase Simplex", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 21, "simplex_iters": 21, "master_time_ms": 5.405, "subproblem_time_ms": 0.234, "total_time_ms": 5.639},
+  {"stratum": "Infeasible", "scale": "Large", "topology": "Random", "instance_name": "random_n150_a1776_s502_k35", "method": "Two-Phase Simplex", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 21, "simplex_iters": 21, "master_time_ms": 5.636, "subproblem_time_ms": 0.231, "total_time_ms": 5.867},
+  {"stratum": "Infeasible", "scale": "Large", "topology": "Random", "instance_name": "random_n150_a1776_s502_k35", "method": "Big-M", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 19, "simplex_iters": 187, "master_time_ms": 5.24, "subproblem_time_ms": 0.638, "total_time_ms": 5.878},
+  {"stratum": "Infeasible", "scale": "Large", "topology": "Random", "instance_name": "random_n150_a1776_s502_k35", "method": "Big-M", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 19, "simplex_iters": 782, "master_time_ms": 6.374, "subproblem_time_ms": 0.693, "total_time_ms": 7.066},
+  {"stratum": "Infeasible", "scale": "Large", "topology": "Random", "instance_name": "random_n150_a1776_s502_k35", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 422, "simplex_iters": 120699, "master_time_ms": 5390.091, "subproblem_time_ms": 2722.904, "total_time_ms": 8245.464},
+  {"stratum": "Infeasible", "scale": "Large", "topology": "Random", "instance_name": "random_n150_a1776_s502_k35", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 489, "simplex_iters": 123672, "master_time_ms": 5553.866, "subproblem_time_ms": 3133.417, "total_time_ms": 8839.673},
+  {"stratum": "Infeasible", "scale": "XL", "topology": "Random", "instance_name": "random_n250_a3007_s502_k50", "method": "Big-M", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 19, "simplex_iters": 188, "master_time_ms": 7.114, "subproblem_time_ms": 2.034, "total_time_ms": 9.148},
+  {"stratum": "Infeasible", "scale": "XL", "topology": "Random", "instance_name": "random_n250_a3007_s502_k50", "method": "Two-Phase Simplex", "seeding_mode": "1 Init Col Seed", "status": "certified_infeasible", "cg_pricing_rounds": 23, "simplex_iters": 66, "master_time_ms": 8.436, "subproblem_time_ms": 1.221, "total_time_ms": 9.657},
+  {"stratum": "Infeasible", "scale": "XL", "topology": "Random", "instance_name": "random_n250_a3007_s502_k50", "method": "Two-Phase Simplex", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 23, "simplex_iters": 66, "master_time_ms": 8.44, "subproblem_time_ms": 1.226, "total_time_ms": 9.666},
+  {"stratum": "Infeasible", "scale": "XL", "topology": "Random", "instance_name": "random_n250_a3007_s502_k50", "method": "Big-M", "seeding_mode": "All Init Cols", "status": "certified_infeasible", "cg_pricing_rounds": 19, "simplex_iters": 1108, "master_time_ms": 8.461, "subproblem_time_ms": 2.355, "total_time_ms": 10.815},
+  {"stratum": "Infeasible", "scale": "XL", "topology": "Random", "instance_name": "random_n250_a3007_s502_k50", "method": "Farkas (Dual Simplex)", "seeding_mode": "1 Init Col Seed", "status": "budget_exhausted", "cg_pricing_rounds": 500, "simplex_iters": 170601, "master_time_ms": 11329.407, "subproblem_time_ms": 11053.394, "total_time_ms": 22654.533},
+  {"stratum": "Infeasible", "scale": "XL", "topology": "Random", "instance_name": "random_n250_a3007_s502_k50", "method": "Farkas (Dual Simplex)", "seeding_mode": "All Init Cols", "status": "budget_exhausted", "cg_pricing_rounds": 500, "simplex_iters": 206621, "master_time_ms": 13338.672, "subproblem_time_ms": 11091.018, "total_time_ms": 24701.321}
+];
+
+        const COLOR_MAP = {
+            'Farkas (Dual Simplex)': '#38bdf8',
+            'Big-M': '#f43f5e',
+            'Two-Phase Simplex': '#10b981'
+        };
+
+        const PLOTLY_CONFIG = {
+            responsive: true,
+            displayModeBar: true,
+            displaylogo: false,
+            modeBarButtonsToRemove: ['lasso2d', 'select2d']
+        };
+
+        const DARK_LAYOUT_BASE = {
+            paper_bgcolor: 'transparent',
+            plot_bgcolor: 'transparent',
+            font: {
+                family: 'Inter, sans-serif',
+                color: '#94a3b8',
+                size: 12
+            },
+            legend: {
+                font: { color: '#f8fafc', size: 12 },
+                orientation: 'h',
+                y: 1.12,
+                x: 0
+            },
+            margin: { t: 40, r: 20, l: 60, b: 60 },
+            hoverlabel: {
+                bgcolor: '#1e293b',
+                bordercolor: '#38bdf8',
+                font: { family: 'Inter', color: '#f8fafc' }
+            }
+        };
+
+        let isLogScale = true;
+        let currentTab = 'tab1';
+        let currentPage = 1;
+        const pageSize = 20;
+        let currentSort = { col: 'total_time_ms', dir: 'desc' };
+
+        function getFilteredData() {
+            const stratum = document.getElementById('stratumFilter').value;
+            const scale = document.getElementById('scaleFilter').value;
+            const topology = document.getElementById('topologyFilter').value;
+            const seeding = document.getElementById('seedingFilter').value;
+            const includeSmallToy = document.getElementById('includeSmallToyToggle').checked;
+
+            return RAW_DATA.filter(d => {
+                if (!includeSmallToy && (d.scale === 'Toy' || d.scale === 'Small')) return false;
+                if (stratum !== 'ALL' && d.stratum !== stratum) return false;
+                if (scale !== 'ALL' && d.scale !== scale) return false;
+                if (topology !== 'ALL' && d.topology !== topology) return false;
+
+                if (seeding === 'All Init Cols' && !d.seeding_mode.includes('All Init')) return false;
+                if (seeding === 'Cold Start' && d.seeding_mode.includes('All Init')) return false;
+
+                return true;
+            });
+        }
+
+        function updateKpiCards() {
+            const filtered = getFilteredData();
+            document.getElementById('kpiRunCount').innerText = filtered.length;
+            const includeSmallToy = document.getElementById('includeSmallToyToggle').checked;
+            document.getElementById('kpiRunDesc').innerText = includeSmallToy ? 
+                'All instances included (Toy, Small, Medium, Large, XL)' : 
+                'Medium, Large & XL instances (Toy/Small excluded)';
+        }
+
+        function renderTab1(data) {
+            const methods = ['Farkas (Dual Simplex)', 'Big-M', 'Two-Phase Simplex'];
+            const scales = ['Toy', 'Small', 'Medium', 'Large', 'XL'];
+            
+            const traces = methods.map(method => {
+                const methodData = data.filter(d => d.method === method);
+                const xVals = [];
+                const yVals = [];
+
+                scales.forEach(s => {
+                    const matches = methodData.filter(d => d.scale === s);
+                    if (matches.length > 0) {
+                        const avgTime = matches.reduce((acc, curr) => acc + curr.total_time_ms, 0) / matches.length;
+                        xVals.push(s);
+                        yVals.push(avgTime);
+                    }
+                });
+
+                return {
+                    x: xVals,
+                    y: yVals,
+                    name: method,
+                    type: 'bar',
+                    marker: { color: COLOR_MAP[method] }
+                };
+            });
+
+            const layout = {
+                ...DARK_LAYOUT_BASE,
+                barmode: 'group',
+                xaxis: { title: { text: 'Instance Scale', font: { color: '#f8fafc' } }, gridcolor: '#1f293d' },
+                yaxis: { 
+                    title: { text: 'Average Total Time (ms)', font: { color: '#f8fafc' } }, 
+                    type: isLogScale ? 'log' : 'linear',
+                    gridcolor: '#1f293d'
+                }
+            };
+
+            Plotly.newPlot('chartScalability', traces, layout, PLOTLY_CONFIG);
+        }
+
+        function renderTab2(data) {
+            const methods = ['Farkas (Dual Simplex)', 'Big-M', 'Two-Phase Simplex'];
+
+            const traces = methods.map(method => {
+                const warmData = data.filter(d => d.method === method && d.seeding_mode.includes('All Init'));
+                const coldData = data.filter(d => d.method === method && !d.seeding_mode.includes('All Init'));
+
+                const warmAvg = warmData.length ? warmData.reduce((a, b) => a + b.total_time_ms, 0) / warmData.length : 0;
+                const coldAvg = coldData.length ? coldData.reduce((a, b) => a + b.total_time_ms, 0) / coldData.length : 0;
+
+                return {
+                    x: ['All Init Cols (Warm)', 'Cold Start (1 Col / No Init)'],
+                    y: [warmAvg, coldAvg],
+                    name: method,
+                    type: 'bar',
+                    marker: { color: COLOR_MAP[method] }
+                };
+            });
+
+            const layout = {
+                ...DARK_LAYOUT_BASE,
+                barmode: 'group',
+                xaxis: { title: { text: 'Seeding Regime', font: { color: '#f8fafc' } }, gridcolor: '#1f293d' },
+                yaxis: { 
+                    title: { text: 'Mean Total Time (ms)', font: { color: '#f8fafc' } }, 
+                    type: isLogScale ? 'log' : 'linear',
+                    gridcolor: '#1f293d'
+                }
+            };
+
+            Plotly.newPlot('chartSeeding', traces, layout, PLOTLY_CONFIG);
+        }
+
+        function renderTab3(data) {
+            const methods = ['Farkas (Dual Simplex)', 'Big-M', 'Two-Phase Simplex'];
+            const masterPct = [];
+            const subprobPct = [];
+
+            methods.forEach(m => {
+                const sub = data.filter(d => d.method === m);
+                if (sub.length) {
+                    const totalMaster = sub.reduce((acc, curr) => acc + curr.master_time_ms, 0);
+                    const totalSub = sub.reduce((acc, curr) => acc + curr.subproblem_time_ms, 0);
+                    const sum = totalMaster + totalSub || 1;
+                    masterPct.push((totalMaster / sum) * 100);
+                    subprobPct.push((totalSub / sum) * 100);
+                } else {
+                    masterPct.push(0);
+                    subprobPct.push(0);
+                }
+            });
+
+            const traceMaster = {
+                x: methods,
+                y: masterPct,
+                name: 'Master LP Solve Time %',
+                type: 'bar',
+                marker: { color: '#38bdf8' }
+            };
+
+            const traceSubprob = {
+                x: methods,
+                y: subprobPct,
+                name: 'Subproblem Pricing Time %',
+                type: 'bar',
+                marker: { color: '#f97316' }
+            };
+
+            const layout = {
+                ...DARK_LAYOUT_BASE,
+                barmode: 'stack',
+                xaxis: { title: { text: 'Initialization Method', font: { color: '#f8fafc' } }, gridcolor: '#1f293d' },
+                yaxis: { title: { text: 'Time Breakdown (%)', font: { color: '#f8fafc' } }, gridcolor: '#1f293d', range: [0, 100] }
+            };
+
+            Plotly.newPlot('chartBreakdown', [traceMaster, traceSubprob], layout, PLOTLY_CONFIG);
+        }
+
+        function renderTab4(data) {
+            const methods = ['Farkas (Dual Simplex)', 'Big-M', 'Two-Phase Simplex'];
+
+            const traces = methods.map(method => {
+                const sub = data.filter(d => d.method === method);
+                return {
+                    x: sub.map(d => Math.max(1, d.cg_pricing_rounds)),
+                    y: sub.map(d => Math.max(1, d.simplex_iters)),
+                    text: sub.map(d => `${d.instance_name}<br>Scale: ${d.scale} | Status: ${d.status}<br>Total Time: ${d.total_time_ms}ms`),
+                    mode: 'markers',
+                    name: method,
+                    type: 'scatter',
+                    marker: {
+                        size: 10,
+                        color: COLOR_MAP[method],
+                        opacity: 0.85
+                    }
+                };
+            });
+
+            const layout = {
+                ...DARK_LAYOUT_BASE,
+                xaxis: { 
+                    title: { text: 'CG Pricing Rounds (Outer Iterations)', font: { color: '#f8fafc' } }, 
+                    type: isLogScale ? 'log' : 'linear',
+                    gridcolor: '#1f293d'
+                },
+                yaxis: { 
+                    title: { text: 'Simplex Iterations (Inner Pivots)', font: { color: '#f8fafc' } }, 
+                    type: isLogScale ? 'log' : 'linear',
+                    gridcolor: '#1f293d'
+                }
+            };
+
+            Plotly.newPlot('chartScatter', traces, layout, PLOTLY_CONFIG);
+        }
+
+        function renderTab5(data) {
+            const feasibleOnly = data.filter(d => d.stratum === 'Feasible' && typeof d.gap_pct === 'number');
+            const methods = ['Farkas (Dual Simplex)', 'Big-M', 'Two-Phase Simplex'];
+
+            const traces = methods.map(method => {
+                const sub = feasibleOnly.filter(d => d.method === method);
+                return {
+                    x: sub.map(d => `${d.instance_name} (${d.seeding_mode.includes('All') ? 'Warm' : 'Cold'})`),
+                    y: sub.map(d => d.gap_pct),
+                    name: method,
+                    type: 'bar',
+                    marker: { color: COLOR_MAP[method] }
+                };
+            });
+
+            const layout = {
+                ...DARK_LAYOUT_BASE,
+                barmode: 'group',
+                xaxis: { title: { text: 'Instance & Seeding Mode', font: { color: '#f8fafc' } }, gridcolor: '#1f293d', tickangle: -45 },
+                yaxis: { title: { text: 'Optimality Gap (%)', font: { color: '#f8fafc' } }, gridcolor: '#1f293d' }
+            };
+
+            Plotly.newPlot('chartGap', traces, layout, PLOTLY_CONFIG);
+        }
+
+        function renderTab6(data) {
+            const infeasibleData = data.filter(d => d.stratum === 'Infeasible');
+            const methods = ['Farkas (Dual Simplex)', 'Big-M', 'Two-Phase Simplex'];
+
+            const certCounts = methods.map(m => infeasibleData.filter(d => d.method === m && d.status === 'certified_infeasible').length);
+            const budgetCounts = methods.map(m => infeasibleData.filter(d => d.method === m && d.status === 'budget_exhausted').length);
+
+            const traceCert = {
+                x: methods,
+                y: certCounts,
+                name: 'Certified Infeasible (Success)',
+                type: 'bar',
+                marker: { color: '#10b981' }
+            };
+
+            const traceBudget = {
+                x: methods,
+                y: budgetCounts,
+                name: 'Budget Exhausted (Failure)',
+                type: 'bar',
+                marker: { color: '#f43f5e' }
+            };
+
+            const layout = {
+                ...DARK_LAYOUT_BASE,
+                barmode: 'stack',
+                xaxis: { title: { text: 'Initialization Method', font: { color: '#f8fafc' } }, gridcolor: '#1f293d' },
+                yaxis: { title: { text: 'Number of Infeasible Instances', font: { color: '#f8fafc' } }, gridcolor: '#1f293d' }
+            };
+
+            Plotly.newPlot('chartReliability', [traceCert, traceBudget], layout, PLOTLY_CONFIG);
+        }
+
+        function renderDataTable() {
+            const filtered = getFilteredData();
+            const search = document.getElementById('tableSearch').value.toLowerCase();
+
+            let matched = filtered.filter(d => {
+                if (!search) return true;
+                return d.instance_name.toLowerCase().includes(search) ||
+                       d.method.toLowerCase().includes(search) ||
+                       d.topology.toLowerCase().includes(search) ||
+                       d.scale.toLowerCase().includes(search) ||
+                       d.status.toLowerCase().includes(search);
+            });
+
+            matched.sort((a, b) => {
+                let valA = a[currentSort.col];
+                let valB = b[currentSort.col];
+                if (typeof valA === 'string') {
+                    valA = valA.toLowerCase();
+                    valB = valB.toLowerCase();
+                }
+                if (valA < valB) return currentSort.dir === 'asc' ? -1 : 1;
+                if (valA > valB) return currentSort.dir === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            const total = matched.length;
+            const maxPage = Math.ceil(total / pageSize) || 1;
+            if (currentPage > maxPage) currentPage = maxPage;
+
+            const startIdx = (currentPage - 1) * pageSize;
+            const endIdx = Math.min(startIdx + pageSize, total);
+            const pageData = matched.slice(startIdx, endIdx);
+
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            pageData.forEach(d => {
+                const statusTag = d.status.includes('certified') ? `<span class="tag-infeasible">Certified Infeasible</span>` :
+                                  d.status.includes('feasible') ? `<span class="tag-feasible">Feasible</span>` :
+                                  `<span class="tag-budget">${d.status}</span>`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${d.stratum}</td>
+                    <td>${d.scale}</td>
+                    <td>${d.topology}</td>
+                    <td><code>${d.instance_name}</code></td>
+                    <td style="color:${COLOR_MAP[d.method] || '#fff'}; font-weight:600;">${d.method}</td>
+                    <td>${d.seeding_mode}</td>
+                    <td>${statusTag}</td>
+                    <td style="text-align:right;">${d.cg_pricing_rounds}</td>
+                    <td style="text-align:right;">${d.simplex_iters}</td>
+                    <td style="text-align:right;">${d.master_time_ms.toFixed(3)}</td>
+                    <td style="text-align:right;">${d.subproblem_time_ms.toFixed(3)}</td>
+                    <td style="text-align:right; font-weight:bold;">${d.total_time_ms.toFixed(3)}</td>
+                    <td style="text-align:right;">${typeof d.gap_pct === 'number' ? d.gap_pct.toFixed(2) + '%' : 'N/A'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('pageInfo').innerText = `Showing ${total ? startIdx + 1 : 0}-${endIdx} of ${total}`;
+            document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+            document.getElementById('nextPageBtn').disabled = currentPage >= maxPage;
+        }
+
+        function updateActiveTabChart() {
+            updateKpiCards();
+            const data = getFilteredData();
+            if (currentTab === 'tab1') renderTab1(data);
+            if (currentTab === 'tab2') renderTab2(data);
+            if (currentTab === 'tab3') renderTab3(data);
+            if (currentTab === 'tab4') renderTab4(data);
+            if (currentTab === 'tab5') renderTab5(data);
+            if (currentTab === 'tab6') renderTab6(data);
+            if (currentTab === 'tab7') renderDataTable();
+        }
+
+        // Event Listeners
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+                const tabId = btn.getAttribute('data-tab');
+                btn.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+
+                currentTab = tabId;
+                updateActiveTabChart();
+            });
+        });
+
+        ['stratumFilter', 'scaleFilter', 'topologyFilter', 'seedingFilter'].forEach(id => {
+            document.getElementById(id).addEventListener('change', () => {
+                currentPage = 1;
+                updateActiveTabChart();
+            });
+        });
+
+        document.getElementById('includeSmallToyToggle').addEventListener('change', () => {
+            currentPage = 1;
+            updateActiveTabChart();
+        });
+
+        document.getElementById('logScaleBtn').addEventListener('click', () => {
+            isLogScale = !isLogScale;
+            document.getElementById('logScaleBtn').classList.toggle('btn-active', isLogScale);
+            document.getElementById('logScaleBtn').innerHTML = `<i class="fa-solid fa-chart-line"></i> Scale: ${isLogScale ? 'Logarithmic' : 'Linear'}`;
+            updateActiveTabChart();
+        });
+
+        document.getElementById('resetFiltersBtn').addEventListener('click', () => {
+            document.getElementById('stratumFilter').value = 'ALL';
+            document.getElementById('scaleFilter').value = 'ALL';
+            document.getElementById('topologyFilter').value = 'ALL';
+            document.getElementById('seedingFilter').value = 'ALL';
+            document.getElementById('includeSmallToyToggle').checked = false;
+            isLogScale = true;
+            document.getElementById('logScaleBtn').classList.add('btn-active');
+            currentPage = 1;
+            updateActiveTabChart();
+        });
+
+        document.getElementById('tableSearch').addEventListener('input', () => {
+            currentPage = 1;
+            renderDataTable();
+        });
+
+        document.getElementById('prevPageBtn').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderDataTable();
+            }
+        });
+
+        document.getElementById('nextPageBtn').addEventListener('click', () => {
+            currentPage++;
+            renderDataTable();
+        });
+
+        document.querySelectorAll('#benchmarkTable th').forEach(th => {
+            th.addEventListener('click', () => {
+                const col = th.getAttribute('data-sort');
+                if (currentSort.col === col) {
+                    currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort.col = col;
+                    currentSort.dir = 'desc';
+                }
+                renderDataTable();
+            });
+        });
+
+        document.getElementById('exportCsvBtn').addEventListener('click', () => {
+            const filtered = getFilteredData();
+            if (!filtered.length) return;
+
+            const headers = Object.keys(filtered[0]);
+            let csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n";
+
+            filtered.forEach(row => {
+                csvContent += headers.map(h => `"${row[h] !== undefined ? row[h] : ''}"`).join(",") + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "cg_initialization_benchmark_export.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // Initial Draw
+        updateActiveTabChart();
+    </script>
+</body>
+</html>

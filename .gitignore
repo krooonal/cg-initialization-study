@@ -1,0 +1,43 @@
+# Build artifacts
+build/
+*.o
+*.so
+*.a
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Executables
+cg_study
+unit_tests
+integration_tests
+
+# Generated instances
+instances/*.json
+instances/*.meta
+!instances/toy_*.json
+
+# Results
+results/*.json
+results/aggregate.json
+
+# Python
+__pycache__/
+*.pyc
+data_gen/__pycache__/
+data_gen/generators/__pycache__/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local private docs
+BUILD_LOCAL.md
+*build_local*

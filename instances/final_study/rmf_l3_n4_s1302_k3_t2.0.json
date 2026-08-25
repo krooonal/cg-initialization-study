@@ -1,0 +1,244 @@
+{
+  "name": "rmf_l3_n4_s1302_k3_t2.0",
+  "generator": "rmf",
+  "seed": 1302,
+  "params": {
+    "layers": 3,
+    "nodes_per_layer": 4,
+    "num_commodities": 3,
+    "tightness": 2.0,
+    "cost_range": [
+      1.0,
+      10.0
+    ],
+    "demand_range": [
+      1.0,
+      5.0
+    ]
+  },
+  "stratum": "infeasible",
+  "reference": {
+    "status": "infeasible",
+    "objective": null
+  },
+  "graph": {
+    "num_nodes": 12,
+    "arcs": [
+      {
+        "tail": 0,
+        "head": 5,
+        "capacity": 0.0,
+        "cost": 5.570956796733333
+      },
+      {
+        "tail": 5,
+        "head": 0,
+        "capacity": 0.0,
+        "cost": 5.570956796733333
+      },
+      {
+        "tail": 1,
+        "head": 4,
+        "capacity": 0.0,
+        "cost": 6.929070888772891
+      },
+      {
+        "tail": 4,
+        "head": 1,
+        "capacity": 0.0,
+        "cost": 6.929070888772891
+      },
+      {
+        "tail": 1,
+        "head": 5,
+        "capacity": 0.0,
+        "cost": 8.115666927823593
+      },
+      {
+        "tail": 5,
+        "head": 1,
+        "capacity": 0.0,
+        "cost": 8.115666927823593
+      },
+      {
+        "tail": 1,
+        "head": 7,
+        "capacity": 0.0,
+        "cost": 5.715490162005568
+      },
+      {
+        "tail": 7,
+        "head": 1,
+        "capacity": 0.0,
+        "cost": 5.715490162005568
+      },
+      {
+        "tail": 3,
+        "head": 4,
+        "capacity": 0.0,
+        "cost": 5.3196776961926
+      },
+      {
+        "tail": 4,
+        "head": 3,
+        "capacity": 0.0,
+        "cost": 5.3196776961926
+      },
+      {
+        "tail": 3,
+        "head": 5,
+        "capacity": 0.0,
+        "cost": 3.9352311956364083
+      },
+      {
+        "tail": 5,
+        "head": 3,
+        "capacity": 0.0,
+        "cost": 3.9352311956364083
+      },
+      {
+        "tail": 3,
+        "head": 6,
+        "capacity": 0.0,
+        "cost": 9.6127155442834
+      },
+      {
+        "tail": 6,
+        "head": 3,
+        "capacity": 0.0,
+        "cost": 9.6127155442834
+      },
+      {
+        "tail": 3,
+        "head": 7,
+        "capacity": 0.0,
+        "cost": 9.872804658683616
+      },
+      {
+        "tail": 7,
+        "head": 3,
+        "capacity": 0.0,
+        "cost": 9.872804658683616
+      },
+      {
+        "tail": 4,
+        "head": 11,
+        "capacity": 0.0,
+        "cost": 6.421070732721861
+      },
+      {
+        "tail": 11,
+        "head": 4,
+        "capacity": 0.0,
+        "cost": 6.421070732721861
+      },
+      {
+        "tail": 5,
+        "head": 11,
+        "capacity": 0.0,
+        "cost": 9.042294083855074
+      },
+      {
+        "tail": 11,
+        "head": 5,
+        "capacity": 0.0,
+        "cost": 9.042294083855074
+      },
+      {
+        "tail": 6,
+        "head": 11,
+        "capacity": 0.0,
+        "cost": 8.897568870134215
+      },
+      {
+        "tail": 11,
+        "head": 6,
+        "capacity": 0.0,
+        "cost": 8.897568870134215
+      },
+      {
+        "tail": 7,
+        "head": 9,
+        "capacity": 0.0,
+        "cost": 3.178483275053246
+      },
+      {
+        "tail": 9,
+        "head": 7,
+        "capacity": 0.0,
+        "cost": 3.178483275053246
+      },
+      {
+        "tail": 0,
+        "head": 2,
+        "capacity": 0.0,
+        "cost": 3.223406046214087
+      },
+      {
+        "tail": 3,
+        "head": 1,
+        "capacity": 0.0,
+        "cost": 8.784474523429973
+      },
+      {
+        "tail": 4,
+        "head": 5,
+        "capacity": 0.0,
+        "cost": 8.63204637824624
+      },
+      {
+        "tail": 4,
+        "head": 7,
+        "capacity": 0.0,
+        "cost": 8.428867521182301
+      },
+      {
+        "tail": 11,
+        "head": 10,
+        "capacity": 0.0,
+        "cost": 7.159607253223608
+      }
+    ]
+  },
+  "commodities": [
+    {
+      "origin": 7,
+      "destination": 9,
+      "demand": 4.827495059182389
+    },
+    {
+      "origin": 4,
+      "destination": 9,
+      "demand": 3.132732837809758
+    },
+    {
+      "origin": 6,
+      "destination": 11,
+      "demand": 2.559135180230502
+    }
+  ],
+  "initial_columns": [
+    {
+      "commodity": 0,
+      "arcs": [
+        22
+      ],
+      "cost": 3.178483275053246
+    },
+    {
+      "commodity": 1,
+      "arcs": [
+        27,
+        22
+      ],
+      "cost": 11.607350796235547
+    },
+    {
+      "commodity": 2,
+      "arcs": [
+        20
+      ],
+      "cost": 8.897568870134215
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "endpoint": {
+    "master_infeasible": false,
+    "gap": 0,
+    "reference_objective": 73.5016,
+    "final_objective": 73.5016,
+    "iterations_to_endpoint": 4,
+    "status": "feasible"
+  },
+  "config": {
+    "price_all_negative": false,
+    "lp_time_limit_sec": 30,
+    "max_rounds": 1000,
+    "time_limit_sec": 300,
+    "max_extra_rounds": 10,
+    "pricing_tol": 1e-06,
+    "kappa": 100,
+    "M": 100
+  },
+  "metrics": {
+    "ray_support_sizes": [
+
+    ],
+    "rays_used": 0,
+    "total_relaxations": 0,
+    "total_pricing_calls": 4,
+    "total_pricing_time_sec": 9.111e-06,
+    "total_master_time_sec": 0.000285778,
+    "total_simplex_iterations": 9
+  },
+  "iteration_log": [
+
+  ],
+  "method": "big_m",
+  "instance": "grid_4x4_s101_k3_t2.0"
+}

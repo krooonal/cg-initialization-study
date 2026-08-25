@@ -1,0 +1,27 @@
+{
+  "name": "toy_feasible",
+  "generator": "manual",
+  "seed": 42,
+  "params": {},
+  "stratum": "feasible",
+  "reference": {
+    "status": "optimal",
+    "objective": 15.0
+  },
+  "graph": {
+    "num_nodes": 4,
+    "arcs": [
+      { "tail": 0, "head": 1, "capacity": 10.0, "cost": 1.0 },
+      { "tail": 1, "head": 2, "capacity": 10.0, "cost": 1.0 },
+      { "tail": 2, "head": 3, "capacity": 10.0, "cost": 1.0 },
+      { "tail": 0, "head": 2, "capacity": 5.0, "cost": 3.0 },
+      { "tail": 1, "head": 3, "capacity": 5.0, "cost": 3.0 }
+    ]
+  },
+  "commodities": [
+    { "origin": 0, "destination": 3, "demand": 5.0 }
+  ],
+  "initial_columns": [
+    { "commodity": 0, "arcs": [0, 1, 2], "cost": 3.0 }
+  ]
+}

@@ -1,0 +1,391 @@
+{
+  "name": "grid_4x4_s102_k5_t0.6",
+  "generator": "grid",
+  "seed": 102,
+  "params": {
+    "nx": 4,
+    "ny": 4,
+    "num_commodities": 5,
+    "tightness": 0.6,
+    "cost_range": [
+      1.0,
+      10.0
+    ],
+    "demand_range": [
+      1.0,
+      5.0
+    ]
+  },
+  "stratum": "infeasible",
+  "reference": {
+    "status": "infeasible",
+    "objective": null
+  },
+  "graph": {
+    "num_nodes": 16,
+    "arcs": [
+      {
+        "tail": 0,
+        "head": 4,
+        "capacity": 10.0,
+        "cost": 2.333540857483752
+      },
+      {
+        "tail": 4,
+        "head": 0,
+        "capacity": 10.0,
+        "cost": 2.333540857483752
+      },
+      {
+        "tail": 0,
+        "head": 1,
+        "capacity": 10.0,
+        "cost": 6.543687583686012
+      },
+      {
+        "tail": 1,
+        "head": 0,
+        "capacity": 10.0,
+        "cost": 6.543687583686012
+      },
+      {
+        "tail": 1,
+        "head": 5,
+        "capacity": 10.0,
+        "cost": 2.527172401471005
+      },
+      {
+        "tail": 5,
+        "head": 1,
+        "capacity": 10.0,
+        "cost": 2.527172401471005
+      },
+      {
+        "tail": 1,
+        "head": 2,
+        "capacity": 10.0,
+        "cost": 7.412562526376869
+      },
+      {
+        "tail": 2,
+        "head": 1,
+        "capacity": 10.0,
+        "cost": 7.412562526376869
+      },
+      {
+        "tail": 2,
+        "head": 6,
+        "capacity": 1.9649978705501094,
+        "cost": 6.470492434817242
+      },
+      {
+        "tail": 6,
+        "head": 2,
+        "capacity": 1.0287611841388036,
+        "cost": 6.470492434817242
+      },
+      {
+        "tail": 2,
+        "head": 3,
+        "capacity": 10.0,
+        "cost": 4.459037249052735
+      },
+      {
+        "tail": 3,
+        "head": 2,
+        "capacity": 10.0,
+        "cost": 4.459037249052735
+      },
+      {
+        "tail": 3,
+        "head": 7,
+        "capacity": 10.0,
+        "cost": 6.55747870253021
+      },
+      {
+        "tail": 7,
+        "head": 3,
+        "capacity": 10.0,
+        "cost": 6.55747870253021
+      },
+      {
+        "tail": 4,
+        "head": 8,
+        "capacity": 0.5,
+        "cost": 6.0962719338522975
+      },
+      {
+        "tail": 8,
+        "head": 4,
+        "capacity": 10.0,
+        "cost": 6.0962719338522975
+      },
+      {
+        "tail": 4,
+        "head": 5,
+        "capacity": 1.1954516573440515,
+        "cost": 1.3890002855560992
+      },
+      {
+        "tail": 5,
+        "head": 4,
+        "capacity": 10.0,
+        "cost": 1.3890002855560992
+      },
+      {
+        "tail": 5,
+        "head": 9,
+        "capacity": 0.16532424924114356,
+        "cost": 5.771064347676171
+      },
+      {
+        "tail": 9,
+        "head": 5,
+        "capacity": 10.0,
+        "cost": 5.771064347676171
+      },
+      {
+        "tail": 5,
+        "head": 6,
+        "capacity": 10.0,
+        "cost": 6.576923733332648
+      },
+      {
+        "tail": 6,
+        "head": 5,
+        "capacity": 1.9031395728752765,
+        "cost": 6.576923733332648
+      },
+      {
+        "tail": 6,
+        "head": 10,
+        "capacity": 0.04726580798825002,
+        "cost": 5.6764810976747375
+      },
+      {
+        "tail": 10,
+        "head": 6,
+        "capacity": 1.3284601421733448,
+        "cost": 5.6764810976747375
+      },
+      {
+        "tail": 6,
+        "head": 7,
+        "capacity": 10.0,
+        "cost": 8.915159789235286
+      },
+      {
+        "tail": 7,
+        "head": 6,
+        "capacity": 10.0,
+        "cost": 8.915159789235286
+      },
+      {
+        "tail": 7,
+        "head": 11,
+        "capacity": 0.5,
+        "cost": 7.617800475043818
+      },
+      {
+        "tail": 11,
+        "head": 7,
+        "capacity": 10.0,
+        "cost": 7.617800475043818
+      },
+      {
+        "tail": 8,
+        "head": 12,
+        "capacity": 10.0,
+        "cost": 4.394079655212789
+      },
+      {
+        "tail": 12,
+        "head": 8,
+        "capacity": 10.0,
+        "cost": 4.394079655212789
+      },
+      {
+        "tail": 8,
+        "head": 9,
+        "capacity": 10.0,
+        "cost": 3.0415577932512425
+      },
+      {
+        "tail": 9,
+        "head": 8,
+        "capacity": 10.0,
+        "cost": 3.0415577932512425
+      },
+      {
+        "tail": 9,
+        "head": 13,
+        "capacity": 6.568809807632266,
+        "cost": 2.1524436307285657
+      },
+      {
+        "tail": 13,
+        "head": 9,
+        "capacity": 10.0,
+        "cost": 2.1524436307285657
+      },
+      {
+        "tail": 9,
+        "head": 10,
+        "capacity": 10.0,
+        "cost": 8.291815679339914
+      },
+      {
+        "tail": 10,
+        "head": 9,
+        "capacity": 10.0,
+        "cost": 8.291815679339914
+      },
+      {
+        "tail": 10,
+        "head": 14,
+        "capacity": 10.0,
+        "cost": 7.208077115221746
+      },
+      {
+        "tail": 14,
+        "head": 10,
+        "capacity": 10.0,
+        "cost": 7.208077115221746
+      },
+      {
+        "tail": 10,
+        "head": 11,
+        "capacity": 10.0,
+        "cost": 6.4838581769028
+      },
+      {
+        "tail": 11,
+        "head": 10,
+        "capacity": 1.5098356602383982,
+        "cost": 6.4838581769028
+      },
+      {
+        "tail": 11,
+        "head": 15,
+        "capacity": 10.0,
+        "cost": 4.975586757700565
+      },
+      {
+        "tail": 15,
+        "head": 11,
+        "capacity": 0.9140344556054133,
+        "cost": 4.975586757700565
+      },
+      {
+        "tail": 12,
+        "head": 13,
+        "capacity": 10.0,
+        "cost": 5.509368609912043
+      },
+      {
+        "tail": 13,
+        "head": 12,
+        "capacity": 0.7509410701497858,
+        "cost": 5.509368609912043
+      },
+      {
+        "tail": 13,
+        "head": 14,
+        "capacity": 2.597315263464121,
+        "cost": 2.9982223617171
+      },
+      {
+        "tail": 14,
+        "head": 13,
+        "capacity": 10.0,
+        "cost": 2.9982223617171
+      },
+      {
+        "tail": 14,
+        "head": 15,
+        "capacity": 2.3806386865268268,
+        "cost": 5.773682987173999
+      },
+      {
+        "tail": 15,
+        "head": 14,
+        "capacity": 10.0,
+        "cost": 5.773682987173999
+      }
+    ]
+  },
+  "commodities": [
+    {
+      "origin": 4,
+      "destination": 15,
+      "demand": 3.4844064537294583
+    },
+    {
+      "origin": 15,
+      "destination": 2,
+      "demand": 1.9857588890579905
+    },
+    {
+      "origin": 2,
+      "destination": 10,
+      "demand": 2.5100346114524363
+    },
+    {
+      "origin": 6,
+      "destination": 13,
+      "demand": 3.990438866702073
+    },
+    {
+      "origin": 13,
+      "destination": 12,
+      "demand": 1.5337600978486008
+    }
+  ],
+  "initial_columns": [
+    {
+      "commodity": 0,
+      "arcs": [
+        16,
+        18,
+        32,
+        44,
+        46
+      ],
+      "cost": 18.084413612851936
+    },
+    {
+      "commodity": 1,
+      "arcs": [
+        41,
+        39,
+        23,
+        9
+      ],
+      "cost": 23.606418467095345
+    },
+    {
+      "commodity": 2,
+      "arcs": [
+        8,
+        22
+      ],
+      "cost": 12.14697353249198
+    },
+    {
+      "commodity": 3,
+      "arcs": [
+        21,
+        18,
+        32
+      ],
+      "cost": 14.500431711737384
+    },
+    {
+      "commodity": 4,
+      "arcs": [
+        43
+      ],
+      "cost": 5.509368609912043
+    }
+  ]
+}
