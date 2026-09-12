@@ -5,10 +5,11 @@
 
 namespace cg {
 
-FarkasMethod::FarkasMethod(const Instance& instance, const RunConfig& config)
-    : instance_(instance), config_(config), rmp_(instance),
+FarkasMethod::FarkasMethod(const Instance& instance, const RunConfig& config,
+                         operations_research::math_opt::LPAlgorithm algo)
+    : instance_(instance), config_(config), algo_(algo), rmp_(instance),
       shortest_path_(instance.graph()), stats_() {
-    rmp_.solver().set_lp_algorithm(operations_research::math_opt::LPAlgorithm::kDualSimplex);
+    rmp_.solver().set_lp_algorithm(algo_);
     // Add initial columns from instance data
     const auto& init_cols = instance_.initial_columns();
     if (!init_cols.empty()) {
@@ -18,7 +19,7 @@ FarkasMethod::FarkasMethod(const Instance& instance, const RunConfig& config)
                 rmp_.add_data_column(init_col.commodity_id, init_col.arcs, init_col.cost);
             }
         } else {
-            // Add only 1 initial column to seed GLOP's dual simplex basis
+            // Add only 1 initial column to seed GLOP's primal simplex basis
             const auto& init_col = init_cols[0];
             rmp_.add_data_column(init_col.commodity_id, init_col.arcs, init_col.cost);
         }
@@ -54,13 +55,7 @@ PricingOutput FarkasMethod::run_farkas_pricing(const std::vector<Real>& ray_valu
         alpha[k] = normalized_ray[k];
     }
     for (int e = 0; e < num_capacity; ++e) {
-        v[e] = normalized_ray[num_demand + e];
-    }
-
-    for (int e = 0; e < num_capacity; ++e) {
-        if (v[e] < -config_.pricing_tol) {
-            throw std::runtime_error("Negative ray value after normalization");
-        }
+        v[e] = std::max(Real(0.0), normalized_ray[num_demand + e]);
     }
 
     for (int k = 0; k < num_demand; ++k) {
@@ -87,13 +82,23 @@ InitMethodResult FarkasMethod::Run() {
     while (iteration < config_.max_rounds) {
         ++iteration;
         SolveResult lp_result = rmp_.solver().solve_with_time_limit(config_.lp_time_limit);
-        stats_.record_lp_solve(lp_result);
 
-        std::cout << "DEBUG Farkas: iteration = " << iteration
-                  << ", lp_result.status = " << static_cast<int>(lp_result.status)
-                  << ", dual_ray size = " << lp_result.dual_ray.size() << std::endl;
+        if (lp_result.basis.has_value()) {
+            rmp_.solver().set_initial_basis(*lp_result.basis);
+        }
 
         if (lp_result.status == SolveStatus::kFeasible) {
+            stats_.record_lp_solve(lp_result);
+            IterationLog log;
+            log.iteration = iteration;
+            log.phase = "farkas";
+            log.lp_status = "feasible";
+            log.objective = lp_result.objective_value;
+            log.simplex_iterations = lp_result.simplex_iterations;
+            log.master_time = lp_result.solve_time;
+            log.total_rmp_cols = rmp_.columns().size();
+            stats_.record_iteration(log);
+
             result.status = TerminationStatus::kFeasible;
             result.iterations_to_endpoint = iteration;
             result.final_objective = lp_result.objective_value;
@@ -101,24 +106,55 @@ InitMethodResult FarkasMethod::Run() {
             break;
         }
 
-        if (lp_result.status != SolveStatus::kInfeasible) {
+        if (lp_result.status == SolveStatus::kInfeasible || lp_result.status == SolveStatus::kUnbounded) {
+            if (algo_ == operations_research::math_opt::LPAlgorithm::kPrimalSimplex) {
+                // Extract dual ray via objective-zero dual simplex workaround
+                std::vector<Real> orig_coeffs = rmp_.solver().get_all_objective_coefficients();
+                rmp_.solver().zero_all_objective_coefficients();
+
+                rmp_.solver().set_lp_algorithm(operations_research::math_opt::LPAlgorithm::kDualSimplex);
+                SolveResult ray_solve_result = rmp_.solver().solve_with_time_limit(config_.lp_time_limit);
+
+                lp_result.dual_ray = ray_solve_result.dual_ray;
+
+                rmp_.solver().set_all_objective_coefficients(orig_coeffs);
+                rmp_.solver().set_lp_algorithm(algo_);
+            }
+        } else {
+            stats_.record_lp_solve(lp_result);
             result.status = TerminationStatus::kError;
+            result.iterations_to_endpoint = iteration;
             break;
         }
 
+        stats_.record_lp_solve(lp_result);
+
         if (!lp_result.dual_ray.empty()) {
-            ++rays_used_;
+            stats_.increment_rays_used();
             int support = 0;
             for (Real val : lp_result.dual_ray) {
                 if (std::abs(val) > config_.pricing_tol) ++support;
             }
-            ray_support_sizes_.push_back(support);
+            stats_.add_ray_support(support);
 
             PricingOutput pricing = run_farkas_pricing(lp_result.dual_ray);
             stats_.record_pricing(pricing);
 
+            IterationLog log;
+            log.iteration = iteration;
+            log.phase = "farkas";
+            log.lp_status = "infeasible";
+            log.objective = 0.0;
+            log.simplex_iterations = lp_result.simplex_iterations;
+            log.master_time = lp_result.solve_time;
+            log.pricing_time = pricing.pricing_time;
+            log.num_data_cols_added = pricing.columns_to_add.size();
+            log.total_rmp_cols = rmp_.columns().size();
+            stats_.record_iteration(log);
+
             if (pricing.columns_to_add.empty()) {
                 result.status = TerminationStatus::kCertifiedInfeasible;
+                result.iterations_to_endpoint = iteration;
                 result.master_infeasible = true;
                 break;
             }
@@ -128,11 +164,13 @@ InitMethodResult FarkasMethod::Run() {
             }
         } else {
             result.status = TerminationStatus::kError;
+            result.iterations_to_endpoint = iteration;
             break;
         }
 
         if (iteration >= config_.max_rounds) {
             result.status = TerminationStatus::kBudgetExhausted;
+            result.iterations_to_endpoint = iteration;
             break;
         }
     }
@@ -142,12 +180,17 @@ InitMethodResult FarkasMethod::Run() {
             SolveResult lp_result = rmp_.solver().solve_with_time_limit(config_.lp_time_limit);
             stats_.record_lp_solve(lp_result);
 
+            if (lp_result.basis.has_value()) {
+                rmp_.solver().set_initial_basis(*lp_result.basis);
+            }
+
             if (lp_result.status != SolveStatus::kFeasible) break;
 
             int num_arcs = instance_.graph().num_arcs();
             std::vector<Real> weights(num_arcs);
             for (int e = 0; e < num_arcs; ++e) {
-                weights[e] = instance_.graph().arc(e).cost - lp_result.dual_solution[rmp_.capacity_row_offset() + e];
+                Real w = instance_.graph().arc(e).cost - lp_result.dual_solution[rmp_.capacity_row_offset() + e];
+                weights[e] = std::max(Real(0.0), w);
             }
 
             PricingOutput pricing;

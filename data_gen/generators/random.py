@@ -86,7 +86,7 @@ def generate_random(params: RandomParams, seed: int) -> InstanceSchema:
 
 
 def adjust_capacities_for_tightness(instance: InstanceSchema, params: RandomParams) -> InstanceSchema:
-    from ..certify import certify_instance
+    from data_gen.certify import certify_instance
 
     num_arcs = len(instance.graph.arcs)
     arc_loads = np.zeros(num_arcs)

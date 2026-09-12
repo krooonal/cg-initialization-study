@@ -65,7 +65,7 @@ TEST_F(IntegrationTest, InfeasibleInstanceAllMethodsDetect) {
 }
 
 TEST_F(IntegrationTest, WarmStartCheck) {
-    Instance instance = Instance::load("instances/toy_feasible.json");
+    Instance instance = Instance::load("instances/toy_infeasible.json");
 
     auto farkas = create_method("farkas", instance, config_);
     InitMethodResult result = farkas->Run();

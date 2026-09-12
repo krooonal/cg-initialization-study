@@ -27,7 +27,7 @@ Real BigMMethod::compute_M() const {
     for (const Arc& arc : instance_.graph().arcs()) {
         max_cost = std::max(max_cost, std::abs(arc.cost));
     }
-    return config_.kappa * max_cost;
+    return std::max(config_.M, config_.kappa * max_cost);
 }
 
 PricingOutput BigMMethod::run_pricing(const std::vector<Real>& demand_duals,
@@ -97,7 +97,6 @@ InitMethodResult BigMMethod::Run() {
 
     while (iteration < config_.max_rounds) {
         ++iteration;
-        auto lp_start = std::chrono::high_resolution_clock::now();
         SolveResult lp_result = rmp_.solver().solve_with_time_limit(config_.lp_time_limit);
         stats_.record_lp_solve(lp_result);
 

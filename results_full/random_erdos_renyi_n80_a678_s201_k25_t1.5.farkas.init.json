@@ -1,0 +1,159 @@
+{
+  "endpoint": {
+    "master_infeasible": false,
+    "gap": -0.307286,
+    "reference_objective": 561.369,
+    "final_objective": 388.868,
+    "iterations_to_endpoint": 9,
+    "status": "feasible"
+  },
+  "config": {
+    "price_all_negative": false,
+    "lp_time_limit_sec": 30,
+    "max_rounds": 1000,
+    "time_limit_sec": 300,
+    "max_extra_rounds": 10,
+    "pricing_tol": 1e-06,
+    "kappa": 100,
+    "M": 100
+  },
+  "metrics": {
+    "ray_support_sizes": [
+      2,
+      3,
+      3,
+      4,
+      2,
+      2,
+      2,
+      2
+    ],
+    "rays_used": 8,
+    "total_relaxations": 0,
+    "total_pricing_calls": 11,
+    "total_pricing_time_sec": 0.000766672,
+    "total_master_time_sec": 0.00167843,
+    "total_simplex_iterations": 54
+  },
+  "iteration_log": [
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 3.2007e-05,
+      "total_rmp_cols": 25,
+      "master_time_sec": 0.000229617,
+      "simplex_iterations": 0,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 1
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 6.4718e-05,
+      "total_rmp_cols": 26,
+      "master_time_sec": 0.000130436,
+      "simplex_iterations": 1,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 2
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 3.4472e-05,
+      "total_rmp_cols": 27,
+      "master_time_sec": 0.00011721,
+      "simplex_iterations": 2,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 3
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 1.6234e-05,
+      "total_rmp_cols": 28,
+      "master_time_sec": 0.000127035,
+      "simplex_iterations": 3,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 4
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 5.3659e-05,
+      "total_rmp_cols": 29,
+      "master_time_sec": 0.000125395,
+      "simplex_iterations": 4,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 5
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 9.7415e-05,
+      "total_rmp_cols": 30,
+      "master_time_sec": 0.000132311,
+      "simplex_iterations": 6,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 6
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 9.1853e-05,
+      "total_rmp_cols": 31,
+      "master_time_sec": 0.000135526,
+      "simplex_iterations": 7,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 7
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 1.1499e-05,
+      "total_rmp_cols": 32,
+      "master_time_sec": 0.000142459,
+      "simplex_iterations": 9,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 8
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 0,
+      "pricing_time_sec": 1.1499e-05,
+      "total_rmp_cols": 33,
+      "master_time_sec": 0.000187977,
+      "simplex_iterations": 18,
+      "lp_status": "feasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 388.868,
+      "iteration": 9
+    }
+  ],
+  "method": "farkas",
+  "instance": "random_erdos_renyi_n80_a678_s201_k25_t1.5"
+}

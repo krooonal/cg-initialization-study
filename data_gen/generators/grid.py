@@ -78,7 +78,7 @@ def generate_grid(params: GridParams, seed: int) -> InstanceSchema:
 
 def adjust_capacities_for_tightness(instance: InstanceSchema, params: GridParams) -> InstanceSchema:
     """Adjust capacities based on tightness parameter using seed routing."""
-    from ..certify import certify_instance
+    from data_gen.certify import certify_instance
 
     num_arcs = len(instance.graph.arcs)
     num_commodities = len(instance.commodities)

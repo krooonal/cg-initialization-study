@@ -1,0 +1,159 @@
+{
+  "endpoint": {
+    "master_infeasible": false,
+    "gap": -1,
+    "reference_objective": 209.822,
+    "final_objective": 0,
+    "iterations_to_endpoint": 9,
+    "status": "feasible"
+  },
+  "config": {
+    "price_all_negative": false,
+    "lp_time_limit_sec": 30,
+    "max_rounds": 1000,
+    "time_limit_sec": 300,
+    "max_extra_rounds": 10,
+    "pricing_tol": 1e-06,
+    "kappa": 100,
+    "M": 100
+  },
+  "metrics": {
+    "ray_support_sizes": [
+      1,
+      1,
+      1,
+      1,
+      2,
+      2,
+      2,
+      3
+    ],
+    "rays_used": 8,
+    "total_relaxations": 0,
+    "total_pricing_calls": 9,
+    "total_pricing_time_sec": 2.305e-05,
+    "total_master_time_sec": 0.000466125,
+    "total_simplex_iterations": 9
+  },
+  "iteration_log": [
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 4.255e-06,
+      "total_rmp_cols": 1,
+      "master_time_sec": 0.000162178,
+      "simplex_iterations": 0,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 1
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 1.739e-06,
+      "total_rmp_cols": 2,
+      "master_time_sec": 6.3601e-05,
+      "simplex_iterations": 1,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 2
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 3.274e-06,
+      "total_rmp_cols": 3,
+      "master_time_sec": 3.906e-05,
+      "simplex_iterations": 2,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 3
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 1.718e-06,
+      "total_rmp_cols": 4,
+      "master_time_sec": 2.7837e-05,
+      "simplex_iterations": 1,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 4
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 9.46e-07,
+      "total_rmp_cols": 5,
+      "master_time_sec": 3.0449e-05,
+      "simplex_iterations": 1,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 5
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 2.551e-06,
+      "total_rmp_cols": 6,
+      "master_time_sec": 3.1638e-05,
+      "simplex_iterations": 1,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 6
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 1.742e-06,
+      "total_rmp_cols": 7,
+      "master_time_sec": 2.8784e-05,
+      "simplex_iterations": 1,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 7
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 2.414e-06,
+      "total_rmp_cols": 8,
+      "master_time_sec": 3.1445e-05,
+      "simplex_iterations": 1,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 8
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 0,
+      "pricing_time_sec": 2.414e-06,
+      "total_rmp_cols": 9,
+      "master_time_sec": 3.0156e-05,
+      "simplex_iterations": 1,
+      "lp_status": "feasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 9
+    }
+  ],
+  "method": "farkas_dual",
+  "instance": "grid_4x4_s101_k5_t0.6"
+}

@@ -98,9 +98,21 @@ add_test(NAME toy_infeasible_farkas
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+find_package(GTest QUIET)
+if(NOT GTest_FOUND)
+    include(FetchContent)
+    FetchContent_Declare(
+      googletest
+      URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+    )
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+endif()
 
-find_package(GTest REQUIRED)
+if(NOT TARGET GTest::GTest)
+    add_library(GTest::GTest ALIAS gtest)
+    add_library(GTest::Main ALIAS gtest_main)
+endif()
 
 set(UNIT_TEST_SOURCES
     tests/unit_tests.cc

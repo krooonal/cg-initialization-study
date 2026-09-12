@@ -23,6 +23,7 @@ struct SolveResult {
     std::vector<Real> primal_solution;
     std::vector<Real> dual_solution;
     std::vector<Real> dual_ray;
+    std::optional<operations_research::math_opt::Basis> basis;
     Real objective_value = 0.0;
     int64_t simplex_iterations = 0;
     std::chrono::nanoseconds solve_time;
@@ -58,6 +59,14 @@ public:
     operations_research::math_opt::LinearExpression get_objective_linear_expression();
     void rebuild_objective_from_coefficients();
 
+    std::vector<Real> get_all_objective_coefficients() const;
+    void set_all_objective_coefficients(const std::vector<Real>& coeffs);
+    void zero_all_objective_coefficients();
+
+    void set_initial_basis(const operations_research::math_opt::Basis& basis) { initial_basis_ = basis; }
+    void clear_initial_basis() { initial_basis_.reset(); }
+    bool has_initial_basis() const { return initial_basis_.has_value(); }
+
     SolveResult solve();
 
     SolveResult solve_with_time_limit(std::chrono::nanoseconds time_limit = std::chrono::nanoseconds::max());
@@ -90,6 +99,7 @@ private:
     std::unique_ptr<operations_research::math_opt::IncrementalSolver> incremental_solver_;
     std::vector<operations_research::math_opt::Variable> variables_;
     std::vector<operations_research::math_opt::LinearConstraint> constraints_;
+    std::optional<operations_research::math_opt::Basis> initial_basis_;
 
     SolveStats stats_;
 

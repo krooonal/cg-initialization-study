@@ -1,0 +1,48 @@
+{
+  "endpoint": {
+    "master_infeasible": true,
+    "gap": 0,
+    "reference_objective": 0,
+    "final_objective": 0,
+    "iterations_to_endpoint": 1,
+    "status": "certified_infeasible"
+  },
+  "config": {
+    "price_all_negative": false,
+    "lp_time_limit_sec": 30,
+    "max_rounds": 1000,
+    "time_limit_sec": 300,
+    "max_extra_rounds": 10,
+    "pricing_tol": 1e-06,
+    "kappa": 100,
+    "M": 100
+  },
+  "metrics": {
+    "ray_support_sizes": [
+      2
+    ],
+    "rays_used": 1,
+    "total_relaxations": 0,
+    "total_pricing_calls": 1,
+    "total_pricing_time_sec": 3.269e-06,
+    "total_master_time_sec": 0.000276242,
+    "total_simplex_iterations": 1
+  },
+  "iteration_log": [
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 0,
+      "pricing_time_sec": 3.269e-06,
+      "total_rmp_cols": 1,
+      "master_time_sec": 0.000276242,
+      "simplex_iterations": 1,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 1
+    }
+  ],
+  "method": "farkas_dual",
+  "instance": "rmf_l3_n4_s1302_k3_t0.6"
+}

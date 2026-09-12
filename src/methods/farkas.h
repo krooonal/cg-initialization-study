@@ -10,7 +10,8 @@ namespace cg {
 
 class FarkasMethod : public InitMethod {
 public:
-    FarkasMethod(const Instance& instance, const RunConfig& config);
+    FarkasMethod(const Instance& instance, const RunConfig& config,
+                 operations_research::math_opt::LPAlgorithm algo = operations_research::math_opt::LPAlgorithm::kPrimalSimplex);
 
     InitMethodResult Run() override;
     const Stats& stats() const override { return stats_; }
@@ -19,6 +20,7 @@ public:
 private:
     const Instance& instance_;
     RunConfig config_;
+    operations_research::math_opt::LPAlgorithm algo_;
     RmpModel rmp_;
     ShortestPath shortest_path_;
     Stats stats_;

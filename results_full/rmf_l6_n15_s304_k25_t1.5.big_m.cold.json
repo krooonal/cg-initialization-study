@@ -1,0 +1,36 @@
+{
+  "endpoint": {
+    "master_infeasible": true,
+    "gap": 0,
+    "reference_objective": 0,
+    "final_objective": 0,
+    "iterations_to_endpoint": 0,
+    "status": "certified_infeasible"
+  },
+  "config": {
+    "price_all_negative": false,
+    "lp_time_limit_sec": 30,
+    "max_rounds": 1000,
+    "time_limit_sec": 300,
+    "max_extra_rounds": 10,
+    "pricing_tol": 1e-06,
+    "kappa": 100,
+    "M": 100
+  },
+  "metrics": {
+    "ray_support_sizes": [
+
+    ],
+    "rays_used": 0,
+    "total_relaxations": 0,
+    "total_pricing_calls": 19,
+    "total_pricing_time_sec": 0.00142237,
+    "total_master_time_sec": 0.00345111,
+    "total_simplex_iterations": 190
+  },
+  "iteration_log": [
+
+  ],
+  "method": "big_m",
+  "instance": "rmf_l6_n15_s304_k25_t1.5"
+}

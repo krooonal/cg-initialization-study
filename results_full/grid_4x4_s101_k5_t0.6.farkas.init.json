@@ -1,0 +1,145 @@
+{
+  "endpoint": {
+    "master_infeasible": false,
+    "gap": -0.98764,
+    "reference_objective": 209.822,
+    "final_objective": 2.59349,
+    "iterations_to_endpoint": 8,
+    "status": "feasible"
+  },
+  "config": {
+    "price_all_negative": false,
+    "lp_time_limit_sec": 30,
+    "max_rounds": 1000,
+    "time_limit_sec": 300,
+    "max_extra_rounds": 10,
+    "pricing_tol": 1e-06,
+    "kappa": 100,
+    "M": 100
+  },
+  "metrics": {
+    "ray_support_sizes": [
+      2,
+      2,
+      3,
+      2,
+      2,
+      3,
+      3
+    ],
+    "rays_used": 7,
+    "total_relaxations": 0,
+    "total_pricing_calls": 8,
+    "total_pricing_time_sec": 2.1913e-05,
+    "total_master_time_sec": 0.000436945,
+    "total_simplex_iterations": 8
+  },
+  "iteration_log": [
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 4.09e-06,
+      "total_rmp_cols": 5,
+      "master_time_sec": 0.000206468,
+      "simplex_iterations": 0,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 1
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 3.688e-06,
+      "total_rmp_cols": 6,
+      "master_time_sec": 2.4537e-05,
+      "simplex_iterations": 0,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 2
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 1.824e-06,
+      "total_rmp_cols": 7,
+      "master_time_sec": 1.9781e-05,
+      "simplex_iterations": 0,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 3
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 1.05e-06,
+      "total_rmp_cols": 8,
+      "master_time_sec": 3.8928e-05,
+      "simplex_iterations": 1,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 4
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 2.176e-06,
+      "total_rmp_cols": 9,
+      "master_time_sec": 2.7216e-05,
+      "simplex_iterations": 1,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 5
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 2.317e-06,
+      "total_rmp_cols": 10,
+      "master_time_sec": 3.0514e-05,
+      "simplex_iterations": 2,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 6
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 2.312e-06,
+      "total_rmp_cols": 11,
+      "master_time_sec": 2.8831e-05,
+      "simplex_iterations": 2,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 7
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 0,
+      "pricing_time_sec": 2.312e-06,
+      "total_rmp_cols": 12,
+      "master_time_sec": 3.5767e-05,
+      "simplex_iterations": 2,
+      "lp_status": "feasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 2.59349,
+      "iteration": 8
+    }
+  ],
+  "method": "farkas",
+  "instance": "grid_4x4_s101_k5_t0.6"
+}

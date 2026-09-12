@@ -104,6 +104,29 @@ void LpSolver::rebuild_objective_from_coefficients() {
     }
 }
 
+std::vector<Real> LpSolver::get_all_objective_coefficients() const {
+    std::vector<Real> coeffs(num_cols_);
+    for (int i = 0; i < num_cols_; ++i) {
+        coeffs[i] = model_.objective_coefficient(variables_[i]);
+    }
+    return coeffs;
+}
+
+void LpSolver::set_all_objective_coefficients(const std::vector<Real>& coeffs) {
+    if (coeffs.size() != static_cast<size_t>(num_cols_)) {
+        throw std::invalid_argument("Objective coefficients size mismatch");
+    }
+    for (int i = 0; i < num_cols_; ++i) {
+        model_.set_objective_coefficient(variables_[i], coeffs[i]);
+    }
+}
+
+void LpSolver::zero_all_objective_coefficients() {
+    for (int i = 0; i < num_cols_; ++i) {
+        model_.set_objective_coefficient(variables_[i], 0.0);
+    }
+}
+
 void LpSolver::configure_parameters(SolveArguments& args,
                                     std::optional<std::chrono::nanoseconds> time_limit) {
     args.parameters.lp_algorithm = lp_algorithm_;
@@ -113,6 +136,16 @@ void LpSolver::configure_parameters(SolveArguments& args,
     if (time_limit.has_value()) {
         auto seconds = std::chrono::duration_cast<std::chrono::seconds>(time_limit.value());
         args.parameters.time_limit = absl::Seconds(seconds.count());
+    }
+
+    if (initial_basis_.has_value()) {
+        Basis basis_to_use = *initial_basis_;
+        for (int i = 0; i < num_cols_; ++i) {
+            if (!basis_to_use.variable_status.contains(variables_[i])) {
+                basis_to_use.variable_status[variables_[i]] = operations_research::math_opt::BasisStatus::kAtLowerBound;
+            }
+        }
+        args.model_parameters.initial_basis = basis_to_use;
     }
 }
 
@@ -140,6 +173,13 @@ SolveResult LpSolver::extract_result(const operations_research::math_opt::SolveR
             out.status = SolveStatus::kError;
     }
 
+    if (result.has_basis()) {
+        Basis b;
+        b.constraint_status = result.constraint_status();
+        b.variable_status = result.variable_status();
+        out.basis = b;
+    }
+
     if (out.status == SolveStatus::kFeasible) {
         out.primal_solution.resize(num_cols_);
         const auto& var_values = result.variable_values();
@@ -158,7 +198,8 @@ SolveResult LpSolver::extract_result(const operations_research::math_opt::SolveR
         } else {
             out.objective_value = 0.0;
         }
-    } else if (out.status == SolveStatus::kInfeasible && result.has_dual_ray()) {
+    }
+    if (result.has_dual_ray()) {
         const auto& ray_dual_values = result.ray_dual_values();
         out.dual_ray.resize(num_rows_);
         for (int i = 0; i < num_rows_; ++i) {

@@ -16,7 +16,10 @@ std::unique_ptr<InitMethod> create_method(const std::string& method_name,
         auto method = std::make_unique<TwoPhaseMethod>(instance, config);
         return method;
     } else if (method_name == "farkas") {
-        auto method = std::make_unique<FarkasMethod>(instance, config);
+        auto method = std::make_unique<FarkasMethod>(instance, config, operations_research::math_opt::LPAlgorithm::kPrimalSimplex);
+        return method;
+    } else if (method_name == "farkas_dual") {
+        auto method = std::make_unique<FarkasMethod>(instance, config, operations_research::math_opt::LPAlgorithm::kDualSimplex);
         return method;
     }
     throw std::invalid_argument("Unknown method: " + method_name);

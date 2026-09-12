@@ -1,7 +1,7 @@
 import json
 import os
 from typing import Dict, List, Optional
-from ..schemas import InstanceSchema, Arc, Commodity, GraphData, Reference
+from data_gen.schemas import InstanceSchema, Arc, Commodity, GraphData, Reference
 
 
 def parse_netgen_file(filepath: str) -> Optional[InstanceSchema]:

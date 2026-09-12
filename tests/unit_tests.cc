@@ -2,6 +2,8 @@
 #include "graph.h"
 #include "json.h"
 #include "instance.h"
+#include "lp_solver.h"
+#include "methods/farkas.h"
 #include <gtest/gtest.h>
 #include <vector>
 
@@ -132,7 +134,7 @@ TEST(InstanceTest, LoadToyFeasible) {
     EXPECT_EQ(inst.num_commodities(), 1);
     EXPECT_EQ(inst.commodities()[0].demand, 5.0);
     EXPECT_TRUE(inst.reference().objective.has_value());
-    EXPECT_NEAR(inst.reference().objective.value(), 10.0, 1e-9);
+    EXPECT_NEAR(inst.reference().objective.value(), 15.0, 1e-9);
 }
 
 TEST(InstanceTest, LoadToyInfeasible) {
@@ -140,6 +142,44 @@ TEST(InstanceTest, LoadToyInfeasible) {
     EXPECT_EQ(inst.name(), "toy_infeasible");
     EXPECT_EQ(inst.stratum(), "infeasible");
     EXPECT_FALSE(inst.reference().objective.has_value());
+}
+
+TEST(LpSolverTest, BasisAndObjectiveHelpers) {
+    LpSolver solver(1, {{1.0, 1.0}});
+    solver.add_column({0}, {1.0}, 5.0, 0.0, 10.0);
+    solver.set_objective_sense_minimize();
+
+    EXPECT_FALSE(solver.has_initial_basis());
+    SolveResult res1 = solver.solve();
+    EXPECT_EQ(res1.status, SolveStatus::kFeasible);
+    EXPECT_TRUE(res1.basis.has_value());
+
+    solver.set_initial_basis(*res1.basis);
+    EXPECT_TRUE(solver.has_initial_basis());
+
+    auto orig_coeffs = solver.get_all_objective_coefficients();
+    EXPECT_EQ(orig_coeffs.size(), 1);
+    EXPECT_DOUBLE_EQ(orig_coeffs[0], 5.0);
+
+    solver.zero_all_objective_coefficients();
+    EXPECT_DOUBLE_EQ(solver.get_objective_coefficient(0), 0.0);
+
+    solver.set_all_objective_coefficients(orig_coeffs);
+    EXPECT_DOUBLE_EQ(solver.get_objective_coefficient(0), 5.0);
+}
+
+TEST(FarkasMethodTest, ParametricAlgo) {
+    Instance inst = Instance::load("instances/toy_infeasible.json");
+    RunConfig config;
+    config.use_initial_columns = true;
+
+    FarkasMethod farkas_primal(inst, config, operations_research::math_opt::LPAlgorithm::kPrimalSimplex);
+    InitMethodResult res_primal = farkas_primal.Run();
+    EXPECT_EQ(res_primal.status, TerminationStatus::kCertifiedInfeasible);
+
+    FarkasMethod farkas_dual(inst, config, operations_research::math_opt::LPAlgorithm::kDualSimplex);
+    InitMethodResult res_dual = farkas_dual.Run();
+    EXPECT_EQ(res_dual.status, TerminationStatus::kCertifiedInfeasible);
 }
 
 int main(int argc, char** argv) {

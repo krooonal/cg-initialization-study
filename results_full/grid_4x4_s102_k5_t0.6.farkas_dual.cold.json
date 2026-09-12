@@ -1,0 +1,104 @@
+{
+  "endpoint": {
+    "master_infeasible": true,
+    "gap": 0,
+    "reference_objective": 0,
+    "final_objective": 0,
+    "iterations_to_endpoint": 5,
+    "status": "certified_infeasible"
+  },
+  "config": {
+    "price_all_negative": false,
+    "lp_time_limit_sec": 30,
+    "max_rounds": 1000,
+    "time_limit_sec": 300,
+    "max_extra_rounds": 10,
+    "pricing_tol": 1e-06,
+    "kappa": 100,
+    "M": 100
+  },
+  "metrics": {
+    "ray_support_sizes": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ],
+    "rays_used": 5,
+    "total_relaxations": 0,
+    "total_pricing_calls": 5,
+    "total_pricing_time_sec": 1.2609e-05,
+    "total_master_time_sec": 0.000369357,
+    "total_simplex_iterations": 5
+  },
+  "iteration_log": [
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 4.072e-06,
+      "total_rmp_cols": 1,
+      "master_time_sec": 0.000187696,
+      "simplex_iterations": 0,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 1
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 1.539e-06,
+      "total_rmp_cols": 2,
+      "master_time_sec": 6.8802e-05,
+      "simplex_iterations": 2,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 2
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 1.492e-06,
+      "total_rmp_cols": 3,
+      "master_time_sec": 4.1835e-05,
+      "simplex_iterations": 1,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 3
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 1.506e-06,
+      "total_rmp_cols": 4,
+      "master_time_sec": 3.2729e-05,
+      "simplex_iterations": 1,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 4
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 0,
+      "pricing_time_sec": 4e-06,
+      "total_rmp_cols": 5,
+      "master_time_sec": 3.8295e-05,
+      "simplex_iterations": 1,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 5
+    }
+  ],
+  "method": "farkas_dual",
+  "instance": "grid_4x4_s102_k5_t0.6"
+}

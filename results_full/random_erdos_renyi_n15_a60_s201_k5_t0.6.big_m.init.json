@@ -1,0 +1,36 @@
+{
+  "endpoint": {
+    "master_infeasible": false,
+    "gap": 0,
+    "reference_objective": 91.398,
+    "final_objective": 91.398,
+    "iterations_to_endpoint": 6,
+    "status": "feasible"
+  },
+  "config": {
+    "price_all_negative": false,
+    "lp_time_limit_sec": 30,
+    "max_rounds": 1000,
+    "time_limit_sec": 300,
+    "max_extra_rounds": 10,
+    "pricing_tol": 1e-06,
+    "kappa": 100,
+    "M": 100
+  },
+  "metrics": {
+    "ray_support_sizes": [
+
+    ],
+    "rays_used": 0,
+    "total_relaxations": 0,
+    "total_pricing_calls": 6,
+    "total_pricing_time_sec": 2.0992e-05,
+    "total_master_time_sec": 0.000444701,
+    "total_simplex_iterations": 48
+  },
+  "iteration_log": [
+
+  ],
+  "method": "big_m",
+  "instance": "random_erdos_renyi_n15_a60_s201_k5_t0.6"
+}

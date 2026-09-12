@@ -1,0 +1,48 @@
+{
+  "endpoint": {
+    "master_infeasible": false,
+    "gap": 0,
+    "reference_objective": 15,
+    "final_objective": 15,
+    "iterations_to_endpoint": 1,
+    "status": "feasible"
+  },
+  "config": {
+    "price_all_negative": false,
+    "lp_time_limit_sec": 30,
+    "max_rounds": 1000,
+    "time_limit_sec": 300,
+    "max_extra_rounds": 10,
+    "pricing_tol": 1e-06,
+    "kappa": 100,
+    "M": 100
+  },
+  "metrics": {
+    "ray_support_sizes": [
+
+    ],
+    "rays_used": 0,
+    "total_relaxations": 0,
+    "total_pricing_calls": 1,
+    "total_pricing_time_sec": 9.58e-07,
+    "total_master_time_sec": 0.000210828,
+    "total_simplex_iterations": 1
+  },
+  "iteration_log": [
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 0,
+      "pricing_time_sec": 108988,
+      "total_rmp_cols": 1,
+      "master_time_sec": 0.000184388,
+      "simplex_iterations": 1,
+      "lp_status": "feasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 15,
+      "iteration": 1
+    }
+  ],
+  "method": "farkas_dual",
+  "instance": "toy_feasible"
+}

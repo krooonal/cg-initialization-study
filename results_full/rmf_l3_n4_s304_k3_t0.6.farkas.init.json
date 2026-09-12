@@ -1,0 +1,89 @@
+{
+  "endpoint": {
+    "master_infeasible": false,
+    "gap": -0.983111,
+    "reference_objective": 95.1957,
+    "final_objective": 1.60773,
+    "iterations_to_endpoint": 4,
+    "status": "feasible"
+  },
+  "config": {
+    "price_all_negative": false,
+    "lp_time_limit_sec": 30,
+    "max_rounds": 1000,
+    "time_limit_sec": 300,
+    "max_extra_rounds": 10,
+    "pricing_tol": 1e-06,
+    "kappa": 100,
+    "M": 100
+  },
+  "metrics": {
+    "ray_support_sizes": [
+      2,
+      4,
+      2
+    ],
+    "rays_used": 3,
+    "total_relaxations": 0,
+    "total_pricing_calls": 4,
+    "total_pricing_time_sec": 7.964e-06,
+    "total_master_time_sec": 0.000320112,
+    "total_simplex_iterations": 11
+  },
+  "iteration_log": [
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 2.739e-06,
+      "total_rmp_cols": 3,
+      "master_time_sec": 0.000181214,
+      "simplex_iterations": 0,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 1
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 1.381e-06,
+      "total_rmp_cols": 4,
+      "master_time_sec": 4.5407e-05,
+      "simplex_iterations": 2,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 2
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 1,
+      "pricing_time_sec": 1.761e-06,
+      "total_rmp_cols": 5,
+      "master_time_sec": 3.396e-05,
+      "simplex_iterations": 4,
+      "lp_status": "infeasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 0,
+      "iteration": 3
+    },
+    {
+      "num_artificial_cols_added": 0,
+      "num_data_cols_added": 0,
+      "pricing_time_sec": 1.761e-06,
+      "total_rmp_cols": 6,
+      "master_time_sec": 3.671e-05,
+      "simplex_iterations": 5,
+      "lp_status": "feasible",
+      "phase": "farkas",
+      "num_dummy_cols_added": 0,
+      "objective": 1.60773,
+      "iteration": 4
+    }
+  ],
+  "method": "farkas",
+  "instance": "rmf_l3_n4_s304_k3_t0.6"
+}
